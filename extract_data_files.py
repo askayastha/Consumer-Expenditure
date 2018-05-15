@@ -7,7 +7,7 @@ import config
 
 def main():
     extract_data_files(config.INTERVIEW_FILES)
-    extract_data_files(config.DIARY_FILES)
+    # extract_data_files(config.DIARY_FILES)
 
 
 def make_folder(_files_path):
@@ -42,7 +42,7 @@ def extract_data_files(_type):
                         print("Extracting {}".format(file))
                         zip_archive.extract(file, path=extract_files_path)
 
-            break
+            # break
 
 
 if __name__ == "__main__": main()
