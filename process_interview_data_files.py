@@ -11,6 +11,7 @@ def main():
     start_year = int(years[0])
     end_year = int(years[len(years) - 1])
 
+    # Generate years bucket list according to the configuration
     for year in range(start_year, end_year, config.YEAR_BUCKET):
         years_bucket = []
 
@@ -75,12 +76,15 @@ def concat_data_for_type(_type, _year_folders):
             continue
 
         quarter_pipes = []
-        for file_name in os.listdir(year_folder_path):
-            if file_name.endswith(".csv") and _type in file_name:
-                file_path = os.path.join(year_folder_path, file_name)
-                quarter_pipe = pd.read_csv(file_path)
-                quarter_pipes.append(quarter_pipe)
-                # break
+        # Walk the year folder path to see if the files are nested within another folder
+        for dir_path, dir_names, file_names in os.walk(year_folder_path):
+            if file_names:
+                for file_name in file_names:
+                    if file_name.endswith(".csv") and _type in file_name:
+                        file_path = os.path.join(dir_path, file_name)
+                        quarter_pipe = pd.read_csv(file_path)
+                        quarter_pipes.append(quarter_pipe)
+                        # break
 
         # print(quarter_pipes)
         year_pipe = pd.concat(quarter_pipes, axis=0)
