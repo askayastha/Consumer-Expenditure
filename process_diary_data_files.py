@@ -2,12 +2,12 @@ import pandas as pd
 import os
 import config
 
-data_files_path = os.path.join(config.DATA_FILES_PATH, 'interview')
+data_files_path = os.path.join(config.DATA_FILES_PATH, 'diary')
 extract_files_path = os.path.join(data_files_path, config.EXTRACT_FOLDER_NAME)
 
 
 def main():
-    years = list(config.INTERVIEW_FILES.keys())
+    years = list(config.DIARY_FILES.keys())
     start_year = int(years[0])
     end_year = int(years[len(years) - 1])
 
@@ -18,43 +18,36 @@ def main():
         for i in range(config.YEAR_BUCKET):
             years_bucket.append(str(year + i))
         # print(years_bucket)
-        process_interview_data_files(years_bucket)
+        process_diary_data_files(years_bucket)
 
 
-def process_interview_data_files(_years):
+def process_diary_data_files(_years):
     start_year = _years[0]
     end_year = _years[len(_years) - 1]
-    print("\n***** PROCESSING INTERVIEW DATA FROM {} TO {} *****".format(start_year, end_year))
+    print("\n***** PROCESSING DIARY DATA FROM {} TO {} *****".format(start_year, end_year))
     year_folders = []
     for year in _years:
-        year_folders.append(config.INTERVIEW_FILES[year])
+        year_folders.append(config.DIARY_FILES[year])
 
-    fmli_pipe = concat_data_for_type('fmli', year_folders)
-    mtbi_pipe = concat_data_for_type('mtbi', year_folders)
+    fmld_pipe = concat_data_for_type("fmld", year_folders)
+    expd_pipe = concat_data_for_type("expd", year_folders)
 
-    # age_pipe = fmli_pipe['AGE_REF'].groupby(fmli_pipe['NEWID']).max()
-    age_pipe = fmli_pipe.groupby('NEWID')['AGE_REF'].max()
+    # age_pipe = fmld_pipe['AGE_REF'].groupby(fmld_pipe['NEWID']).max()
+    age_pipe = fmld_pipe.groupby('NEWID')['AGE_REF'].max()
     age_pipe = age_pipe.to_frame()
     age_pipe.reset_index(drop=False, inplace=True)
 
-    # spend_pipe = fmli_pipe[['TOTEXPPQ', 'TOTEXPCQ']].groupby(fmli_pipe['NEWID']).sum().round(2)
-    spend_pipe = fmli_pipe.groupby(['NEWID'])['TOTEXPPQ', 'TOTEXPCQ'].sum().round(2)
-    spend_pipe['TOT_SPEND'] = spend_pipe['TOTEXPPQ'] + spend_pipe['TOTEXPCQ']
-    spend_pipe.reset_index(drop=False, inplace=True)
-
-    # age_count_pipe = fmli_pipe['AGE_REF'].groupby(fmli_pipe['AGE_REF']).count()
+    # age_count_pipe = fmld_pipe['AGE_REF'].groupby(fmld_pipe['AGE_REF']).count()
     age_count_pipe = age_pipe.groupby(['AGE_REF'])['AGE_REF'].count()
     age_count_pipe = age_count_pipe.to_frame()
     age_count_pipe.rename(columns={'AGE_REF': 'AGE_COUNT'}, inplace=True)
     age_count_pipe.reset_index(drop=False, inplace=True)
 
-    age_spend_pipe = pd.merge(age_pipe, spend_pipe, on='NEWID')
-
-    monthly_age_spend_pipe = pd.merge(mtbi_pipe[['NEWID', 'UCC']], age_spend_pipe, on='NEWID')
+    monthly_age_spend_pipe = pd.merge(expd_pipe[['NEWID', 'UCC', 'COST']], age_pipe, on='NEWID')
+    monthly_age_spend_pipe.rename(columns={'COST': 'TOT_SPEND'}, inplace=True)
     monthly_age_spend_pipe.drop_duplicates(inplace=True)
 
-    # age_ucc_spend_pipe = monthly_age_spend_pipe['TOT_SPEND'].groupby([monthly_age_spend_pipe['AGE_REF'], monthly_age_spend_pipe['UCC']]).sum()
-    age_ucc_spend_pipe = monthly_age_spend_pipe.groupby(['AGE_REF', 'UCC'])['TOT_SPEND'].sum()
+    age_ucc_spend_pipe = monthly_age_spend_pipe.groupby(['AGE_REF', 'UCC'])['TOT_SPEND'].sum().round(2)
     age_ucc_spend_pipe = age_ucc_spend_pipe.to_frame()
     age_ucc_spend_pipe.reset_index(drop=False, inplace=True)
 
@@ -62,7 +55,7 @@ def process_interview_data_files(_years):
     avg_spend_by_age_ucc['AVG_SPEND'] = (avg_spend_by_age_ucc['TOT_SPEND'] / avg_spend_by_age_ucc['AGE_COUNT']).round(2)
     print(avg_spend_by_age_ucc)
 
-    export_file_path = os.path.join(config.EXPORT_FILES_PATH, "avg_spend_interview_{}_to_{}.csv".format(start_year, end_year))
+    export_file_path = os.path.join(config.EXPORT_FILES_PATH, "avg_spend_diary_{}_to_{}.csv".format(start_year, end_year))
     avg_spend_by_age_ucc.to_csv(export_file_path, index=False)
     print("Exporting data to {}".format(export_file_path))
 

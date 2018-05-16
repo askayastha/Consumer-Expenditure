@@ -26,15 +26,15 @@ def change_folder(_name):
 def download_data_files(_type):
     # Setup for data file types
     if _type == config.INTERVIEW_FILES:
-        change_folder("interview")
+        change_folder('interview')
         download_files_list = config.INTERVIEW_FILES.values()
     elif _type == config.DIARY_FILES:
-        change_folder("diary")
+        change_folder('diary')
         download_files_list = config.DIARY_FILES.values()
 
     # Download all the data files
     for file in download_files_list:
-        file_name = file + ".zip"
+        file_name = file + '.zip'
         download_url = config.DATA_FILES_BASE_URL + file_name
 
         if not file_exists(download_url):
