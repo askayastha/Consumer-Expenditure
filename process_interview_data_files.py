@@ -51,6 +51,7 @@ def process_interview_data_files(_years):
     age_spend_pipe = pd.merge(age_pipe, spend_pipe, on='NEWID')
 
     monthly_age_spend_pipe = pd.merge(mtbi_pipe[['NEWID', 'UCC']], age_spend_pipe, on='NEWID')
+    monthly_age_spend_pipe.drop_duplicates(inplace=True)
 
     # age_ucc_spend_pipe = monthly_age_spend_pipe['TOT_SPEND'].groupby([monthly_age_spend_pipe['AGE_REF'], monthly_age_spend_pipe['UCC']]).sum()
     age_ucc_spend_pipe = monthly_age_spend_pipe.groupby(['AGE_REF', 'UCC'])['TOT_SPEND'].sum()
