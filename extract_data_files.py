@@ -3,6 +3,7 @@ from zipfile import *
 import os
 import constants
 import config
+import utils
 
 
 def main():
@@ -10,23 +11,17 @@ def main():
     extract_data_files(config.DIARY_FILES)
 
 
-def make_folder(_files_path):
-    # Make extracted folder if it doesn't exist
-    if not os.path.exists(_files_path):
-        os.mkdir(_files_path)
-
-
 def extract_data_files(_type):
     # Setup for data file types
     if _type == config.INTERVIEW_FILES:
         data_files_path = os.path.join(config.DATA_FILES_PATH, 'interview')
         extract_files_path = os.path.join(data_files_path, config.EXTRACT_FOLDER_NAME)
-        make_folder(extract_files_path)
+        utils.make_folder(extract_files_path)
         extract_file_types = constants.EXTRACT_INTERVIEW_FILE_TYPES
     elif _type == config.DIARY_FILES:
         data_files_path = os.path.join(config.DATA_FILES_PATH, 'diary')
         extract_files_path = os.path.join(data_files_path, config.EXTRACT_FOLDER_NAME)
-        make_folder(extract_files_path)
+        utils.make_folder(extract_files_path)
         extract_file_types = constants.EXTRACT_DIARY_FILE_TYPES
 
     # Extract all the required data files

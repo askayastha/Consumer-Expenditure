@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 DATA_FILES_BASE_URL = "https://www.bls.gov/cex/pumd/data/comma/"
 EXTRACT_FOLDER_NAME = "extracted_data_files"
@@ -9,7 +10,8 @@ YEAR_BUCKET = 3
 # DOWNLOAD_PATH = os.path.join(os.path.expanduser("~"), "Downloads")
 DOWNLOAD_PATH = "/Volumes/Transcend"
 DATA_FILES_PATH = os.path.join(DOWNLOAD_PATH, DOWNLOAD_FOLDER_NAME)
-EXPORT_FILES_PATH = DATA_FILES_PATH
+today = datetime.now().strftime('%b%d').lower()
+EXPORT_FILES_PATH = os.path.join(DATA_FILES_PATH, "processed_data_{}yrs_bucket_{}".format(YEAR_BUCKET, today))
 
 INTERVIEW_FILES = {
     '1996': 'intrvw96',

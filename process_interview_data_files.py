@@ -1,6 +1,8 @@
 import pandas as pd
 import os
 import config
+import utils
+from datetime import datetime
 
 data_files_path = os.path.join(config.DATA_FILES_PATH, 'interview')
 extract_files_path = os.path.join(data_files_path, config.EXTRACT_FOLDER_NAME)
@@ -11,6 +13,8 @@ def main():
     start_year = int(years[0])
     end_year = int(years[len(years) - 1])
 
+    start_time = datetime.now()
+
     # Generate years bucket list according to the configuration
     for year in range(start_year, end_year, config.YEAR_BUCKET):
         years_bucket = []
@@ -19,6 +23,11 @@ def main():
             years_bucket.append(str(year + i))
         # print(years_bucket)
         process_interview_data_files(years_bucket)
+
+    end_time = datetime.now()
+    overall_time = end_time - start_time
+    print("***** Processing completed for interview data in {} mins(s) {} secs. *****".format(
+        int(overall_time.seconds / 60), overall_time.seconds % 60))
 
 
 def process_interview_data_files(_years):
@@ -62,9 +71,11 @@ def process_interview_data_files(_years):
     avg_spend_by_age_ucc['AVG_SPEND'] = (avg_spend_by_age_ucc['TOT_SPEND'] / avg_spend_by_age_ucc['AGE_COUNT']).round(2)
     print(avg_spend_by_age_ucc)
 
-    export_file_path = os.path.join(config.EXPORT_FILES_PATH, "avg_spend_interview_{}_to_{}.csv".format(start_year, end_year))
-    avg_spend_by_age_ucc.to_csv(export_file_path, index=False)
-    print("Exporting data to {}".format(export_file_path))
+    # Export processed data
+    utils.make_folder(config.EXPORT_FILES_PATH)
+    export_file = os.path.join(config.EXPORT_FILES_PATH, "avg_spend_interview_{}_to_{}.csv".format(start_year, end_year))
+    avg_spend_by_age_ucc.to_csv(export_file, index=False)
+    print("Exporting data to {}".format(export_file))
 
 
 def concat_data_for_type(_type, _year_folders):
