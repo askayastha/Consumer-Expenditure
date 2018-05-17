@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# Job script to download Consumer Expenditure Survey data
+
 import wget
 import os
 import config
@@ -9,6 +12,8 @@ def main():
         os.mkdir(config.DATA_FILES_PATH)
 
     os.chdir(config.DATA_FILES_PATH)
+
+    print("\nDownload Path: {}".format(config.DATA_FILES_PATH))
 
     download_data_files(config.INTERVIEW_FILES)
     download_data_files(config.DIARY_FILES)

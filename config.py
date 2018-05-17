@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# Configuration file
+
 import os
 from datetime import datetime
 import constants

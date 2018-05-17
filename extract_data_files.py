@@ -1,5 +1,7 @@
+#!/usr/bin/python3
+# Job script to extract Consumer Expenditure Survey data
+
 from zipfile import *
-# import argparse
 import os
 import constants
 import config

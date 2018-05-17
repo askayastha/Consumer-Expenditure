@@ -1,4 +1,8 @@
+#!/usr/bin/python3
+# Utility methods file
+
 import os
+
 
 def make_folder(_files_path):
     # Make extracted folder if it doesn't exist

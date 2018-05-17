@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# Main script to run multiple jobs
+
 import sys
 import re
 import os
@@ -61,9 +64,9 @@ def run_jobs(_jobs_list):
             job_success = os.system(job)
 
             if job_success == 0:  # Checks for job success
-                print("{} was successful.")
+                print("\n{} was successful.".format(config.JOBS_DESC[int(job_num)]))
             else:
-                print("{} was not successful.")
+                print("\n{} was not successful.".format(config.JOBS_DESC[int(job_num)]))
                 sys.exit()
 
 

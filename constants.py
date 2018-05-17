@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# Static variables file
+
 # File Types
 PUMD_DATA_FILE_TYPES = ['interview', 'diary']
 EXTRACT_INTERVIEW_FILE_TYPES = ['fmli', 'mtbi']

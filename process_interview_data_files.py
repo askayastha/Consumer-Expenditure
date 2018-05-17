@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# Job script to process Interview files
+
 import pandas as pd
 import os
 import config
@@ -26,7 +29,7 @@ def main():
 
     end_time = datetime.now()
     overall_time = end_time - start_time
-    print("***** Processing completed for interview data in {} mins(s) {} secs. *****".format(
+    print("***** Processing completed for interview data in {} min(s) {} secs. *****".format(
         int(overall_time.seconds / 60), overall_time.seconds % 60))
 
 
