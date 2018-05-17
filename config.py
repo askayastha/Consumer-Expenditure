@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+import constants
 
 DATA_FILES_BASE_URL = "https://www.bls.gov/cex/pumd/data/comma/"
 EXTRACT_FOLDER_NAME = "extracted_data_files"
@@ -59,4 +60,19 @@ DIARY_FILES = {
     '2014': 'diary14',
     '2015': 'diary15',
     '2016': 'diary16'
+}
+
+JOBS = {
+    1: "python3 {}".format(constants.DOWNLOAD_SCRIPT),
+    2: "python3 {}".format(constants.EXTRACT_SCRIPT),
+    3: "python3 {}".format(constants.PROCESS_INTERVIEW_SCRIPT),
+    4: "python3 {}".format(constants.PROCESS_DIARY_SCRIPT)
+}
+
+JOBS_DESC = {
+    1: "Download CE data files",
+    2: "Extract CE data files",
+    3: "Process CE Interview data",
+    4: "Process CE Diary data",
+    5: "Quit"
 }
