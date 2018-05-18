@@ -139,4 +139,4 @@ ENV/
 
 # Custom
 *.plist
-*.txt
+#*.txt
