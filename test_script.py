@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import config
+import utils
 
 data_files_path = os.path.join(config.DATA_FILES_PATH, "interview")
 extract_files_path = os.path.join(data_files_path, config.EXTRACT_FOLDER_NAME)
@@ -15,39 +16,47 @@ def main():
     age_pipe = age_pipe.to_frame()
     age_pipe.reset_index(drop=False, inplace=True)
 
-    # spend_pipe = fmli_pipe[['TOTEXPPQ', 'TOTEXPCQ']].groupby(fmli_pipe['NEWID']).sum().round()
-    spend_pipe = fmli_pipe.groupby(['NEWID'])['TOTEXPPQ', 'TOTEXPCQ'].sum().round()
-    spend_pipe['TOT_SPEND'] = spend_pipe['TOTEXPPQ'] + spend_pipe['TOTEXPCQ']
-    spend_pipe.reset_index(drop=False, inplace=True)
+    # Sum finlwt by age in fmli
+    final_wt_pipe = fmli_pipe.groupby(['AGE_REF'])['FINLWT21'].sum()
+    final_wt_pipe = final_wt_pipe.to_frame()
+    final_wt_pipe.reset_index(drop=False, inplace=True)
 
-    # age_count_pipe = fmli_pipe['AGE_REF'].groupby(fmli_pipe['AGE_REF']).count()
-    age_count_pipe = age_pipe.groupby(['AGE_REF'])['AGE_REF'].count()
-    age_count_pipe = age_count_pipe.to_frame()
-    age_count_pipe = age_count_pipe.rename(columns={'AGE_REF': 'AGE_COUNT'})
-    age_count_pipe.reset_index(drop=False, inplace=True)
+    # age_and_final_wt_pipe = pd.merge(age_pipe, final_wt_pipe, on='AGE_REF')
 
-    age_spend_pipe = pd.merge(age_pipe, spend_pipe, on='NEWID')
-    monthly_age_spend_pipe = pd.merge(mtbi_pipe[['NEWID', 'UCC', 'COST']], age_spend_pipe, on='NEWID')
-    monthly_age_spend_pipe.drop_duplicates(inplace=True)
+    # Sum cost group by ucc, newid in mbti
+    monthly_age_spend_pipe = mtbi_pipe.groupby(['NEWID', 'UCC'])['COST'].sum()
+    monthly_age_spend_pipe = monthly_age_spend_pipe.to_frame()
+    monthly_age_spend_pipe.reset_index(drop=False, inplace=True)
 
-    # age_ucc_spend_pipe = monthly_age_spend_pipe['TOT_SPEND'].groupby([monthly_age_spend_pipe['AGE_REF'], monthly_age_spend_pipe['UCC']]).sum()
-    age_ucc_spend_pipe = monthly_age_spend_pipe.groupby(['AGE_REF', 'UCC'])['TOT_SPEND'].sum()
+    # Merge age and fnllwt by newid from fmli to mbti
+    age_spend_pipe = pd.merge(monthly_age_spend_pipe, age_pipe, on='NEWID')
+    age_spend_final_wt_pipe = pd.merge(age_spend_pipe, final_wt_pipe, on='AGE_REF')
+
+    # Sum fnlwt*cost by age and ucc
+    age_spend_final_wt_pipe['TOT_SPEND'] = age_spend_final_wt_pipe['FINLWT21'] * age_spend_final_wt_pipe['COST']
+
+    age_ucc_spend_pipe = age_spend_final_wt_pipe.groupby(['AGE_REF', 'UCC'])['TOT_SPEND'].sum()
     age_ucc_spend_pipe = age_ucc_spend_pipe.to_frame()
     age_ucc_spend_pipe.reset_index(drop=False, inplace=True)
+    print(age_ucc_spend_pipe)
 
-    avg_spend_by_age_ucc = pd.merge(age_ucc_spend_pipe, age_count_pipe, on='AGE_REF')
-    avg_spend_by_age_ucc['AVG_SPEND'] = (avg_spend_by_age_ucc['TOT_SPEND'] / avg_spend_by_age_ucc['AGE_COUNT']).round()
+    age_ucc_spend_pipe = pd.merge(age_ucc_spend_pipe, final_wt_pipe, on='AGE_REF')
 
-    print(avg_spend_by_age_ucc)
-    export_file_path = os.path.join(config.EXPORT_FILES_PATH, "test_export_file.csv")
-    avg_spend_by_age_ucc.to_csv(export_file_path, index=False)
+    # Divide by sum fnlwt by age calculated above
+    age_ucc_spend_pipe['AVG_SPEND'] = ((age_ucc_spend_pipe['TOT_SPEND'] / age_ucc_spend_pipe['FINLWT21']) * 20).round(2)
+    print(age_ucc_spend_pipe)
 
-    print("Exported data to {}".format(export_file_path))
+    # Export processed data
+    utils.make_folder(config.EXPORT_FILES_PATH)
+    export_file = os.path.join(config.EXPORT_FILES_PATH, "test_export_file.csv")
+    age_ucc_spend_pipe.to_csv(export_file, index=False)
+    print("Exporting data to {}".format(export_file))
 
 
 def concat_data_for_type(_type):
     for folder_name in os.listdir(extract_files_path):
         year_path = os.path.join(extract_files_path, folder_name)
+        print(year_path)
 
         # Skip hidden files
         if '.' in year_path:
