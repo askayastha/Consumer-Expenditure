@@ -13,8 +13,8 @@ extract_files_path = os.path.join(data_files_path, config.EXTRACT_FOLDER_NAME)
 
 def main():
     years = list(config.DIARY_FILES.keys())
-    start_year = int(years[0])
-    end_year = int(years[len(years) - 1])
+    start_year = years[0]
+    end_year = years[-1]
 
     start_time = datetime.now()
 
@@ -23,19 +23,19 @@ def main():
         years_bucket = []
 
         for i in range(config.YEAR_BUCKET):
-            years_bucket.append(str(year + i))
+            years_bucket.append(year + i)
         # print(years_bucket)
         process_diary_data_files(years_bucket)
 
     end_time = datetime.now()
     overall_time = end_time - start_time
     print("***** Processing completed for diary data in {} min(s) {} secs. *****".format(
-        int(overall_time.seconds / 60), overall_time.seconds % 60))
+        overall_time.seconds // 60, overall_time.seconds % 60))
 
 
 def process_diary_data_files(_years):
     start_year = _years[0]
-    end_year = _years[len(_years) - 1]
+    end_year = _years[-1]
     print("\n***** PROCESSING DIARY DATA FROM {} TO {} *****".format(start_year, end_year))
     year_folders = []
     for year in _years:
@@ -45,9 +45,7 @@ def process_diary_data_files(_years):
     expd_pipe = concat_data_for_type("expd", year_folders)
 
     # age_pipe = fmld_pipe['AGE_REF'].groupby(fmld_pipe['NEWID']).max()
-    age_pipe = fmld_pipe.groupby('NEWID')['AGE_REF'].max()
-    age_pipe = age_pipe.to_frame()
-    age_pipe.reset_index(drop=False, inplace=True)
+    age_pipe = fmld_pipe.groupby('NEWID', as_index=False)['AGE_REF'].max()
 
     # age_count_pipe = fmld_pipe['AGE_REF'].groupby(fmld_pipe['AGE_REF']).count()
     age_count_pipe = age_pipe.groupby(['AGE_REF'])['AGE_REF'].count()
@@ -59,9 +57,7 @@ def process_diary_data_files(_years):
     monthly_age_spend_pipe.rename(columns={'COST': 'TOT_SPEND'}, inplace=True)
     monthly_age_spend_pipe.drop_duplicates(inplace=True)
 
-    age_ucc_spend_pipe = monthly_age_spend_pipe.groupby(['AGE_REF', 'UCC'])['TOT_SPEND'].sum().round(2)
-    age_ucc_spend_pipe = age_ucc_spend_pipe.to_frame()
-    age_ucc_spend_pipe.reset_index(drop=False, inplace=True)
+    age_ucc_spend_pipe = monthly_age_spend_pipe.groupby(['AGE_REF', 'UCC'], as_index=False)['TOT_SPEND'].sum().round(2)
 
     avg_spend_by_age_ucc = pd.merge(age_ucc_spend_pipe, age_count_pipe, on='AGE_REF')
     avg_spend_by_age_ucc['AVG_SPEND'] = (avg_spend_by_age_ucc['TOT_SPEND'] / avg_spend_by_age_ucc['AGE_COUNT']).round(2)
@@ -102,4 +98,5 @@ def concat_data_for_type(_type, _year_folders):
     return final_pipe
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

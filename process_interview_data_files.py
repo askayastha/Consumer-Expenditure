@@ -13,8 +13,8 @@ extract_files_path = os.path.join(data_files_path, config.EXTRACT_FOLDER_NAME)
 
 def main():
     years = list(config.INTERVIEW_FILES.keys())
-    start_year = int(years[0])
-    end_year = int(years[len(years) - 1])
+    start_year = years[0]
+    end_year = years[-1]
 
     start_time = datetime.now()
 
@@ -23,19 +23,19 @@ def main():
         years_bucket = []
 
         for i in range(config.YEAR_BUCKET):
-            years_bucket.append(str(year + i))
+            years_bucket.append(year + i)
         # print(years_bucket)
         process_interview_data_files(years_bucket)
 
     end_time = datetime.now()
     overall_time = end_time - start_time
     print("***** Processing completed for interview data in {} min(s) {} secs. *****".format(
-        int(overall_time.seconds / 60), overall_time.seconds % 60))
+        overall_time.seconds // 60, overall_time.seconds % 60))
 
 
 def process_interview_data_files(_years):
     start_year = _years[0]
-    end_year = _years[len(_years) - 1]
+    end_year = _years[-1]
     print("\n***** PROCESSING INTERVIEW DATA FROM {} TO {} *****".format(start_year, end_year))
     year_folders = []
     for year in _years:
@@ -49,6 +49,7 @@ def process_interview_data_files(_years):
 
     # Sum (FINLWT21) grouped by AGE_REF in 'fmli' files
     final_wt_pipe = fmli_pipe.groupby(['AGE_REF'], as_index=False)['FINLWT21'].sum()
+    final_wt_pipe.rename(columns={'FINLWT21': 'SUM_FINLWT21'}, inplace=True)
 
     # Sum (COST) grouped by NEWID, UCC in 'mtbi' files
     monthly_age_spend_pipe = mtbi_pipe.groupby(['NEWID', 'UCC'], as_index=False)['COST'].sum()
@@ -58,12 +59,12 @@ def process_interview_data_files(_years):
     age_spend_final_wt_pipe = pd.merge(age_spend_pipe, final_wt_pipe, on='AGE_REF')
 
     # Sum (FINLWT21 * cost) grouped by AGE_REF, UCC
-    age_spend_final_wt_pipe['TOT_SPEND'] = age_spend_final_wt_pipe['FINLWT21'] * age_spend_final_wt_pipe['COST']
+    age_spend_final_wt_pipe['TOT_SPEND'] = age_spend_final_wt_pipe['SUM_FINLWT21'] * age_spend_final_wt_pipe['COST']
     age_ucc_spend_pipe = age_spend_final_wt_pipe.groupby(['AGE_REF', 'UCC'], as_index=False)['TOT_SPEND'].sum()
     age_ucc_spend_pipe = pd.merge(age_ucc_spend_pipe, final_wt_pipe, on='AGE_REF')
 
     # Divide sum (FINLWT21 * COST) by sum (FINLWT21) calculated above
-    age_ucc_spend_pipe['AVG_SPEND'] = ((age_ucc_spend_pipe['TOT_SPEND'] / age_ucc_spend_pipe['FINLWT21']) * 20).round(2)
+    age_ucc_spend_pipe['AVG_SPEND'] = ((age_ucc_spend_pipe['TOT_SPEND'] / age_ucc_spend_pipe['SUM_FINLWT21']) * 20).round(2)
     print(age_ucc_spend_pipe)
 
     # Export processed data
