@@ -45,36 +45,24 @@ def process_interview_data_files(_years):
     mtbi_pipe = concat_data_for_type('mtbi', year_folders)
 
     # age_pipe = fmli_pipe['AGE_REF'].groupby(fmli_pipe['NEWID']).max()
-    age_pipe = fmli_pipe.groupby('NEWID')['AGE_REF'].max()
-    age_pipe = age_pipe.to_frame()
-    age_pipe.reset_index(drop=False, inplace=True)
+    age_pipe = fmli_pipe.groupby('NEWID', as_index=False)['AGE_REF'].max()
 
-    # Sum finlwt by age in fmli
-    final_wt_pipe = fmli_pipe.groupby(['AGE_REF'])['FINLWT21'].sum()
-    final_wt_pipe = final_wt_pipe.to_frame()
-    final_wt_pipe.reset_index(drop=False, inplace=True)
+    # Sum (FINLWT21) grouped by AGE_REF in 'fmli' files
+    final_wt_pipe = fmli_pipe.groupby(['AGE_REF'], as_index=False)['FINLWT21'].sum()
 
-    # age_and_final_wt_pipe = pd.merge(age_pipe, final_wt_pipe, on='AGE_REF')
+    # Sum (COST) grouped by NEWID, UCC in 'mtbi' files
+    monthly_age_spend_pipe = mtbi_pipe.groupby(['NEWID', 'UCC'], as_index=False)['COST'].sum()
 
-    # Sum cost group by ucc, newid in mbti
-    monthly_age_spend_pipe = mtbi_pipe.groupby(['NEWID', 'UCC'])['COST'].sum()
-    monthly_age_spend_pipe = monthly_age_spend_pipe.to_frame()
-    monthly_age_spend_pipe.reset_index(drop=False, inplace=True)
-
-    # Merge age and fnllwt by newid from fmli to mbti
+    # Merge AGE_REF and FINLWT21 by NEWID from 'fmli' to 'mbti' files
     age_spend_pipe = pd.merge(monthly_age_spend_pipe, age_pipe, on='NEWID')
     age_spend_final_wt_pipe = pd.merge(age_spend_pipe, final_wt_pipe, on='AGE_REF')
 
-    # Sum fnlwt*cost by age and ucc
+    # Sum (FINLWT21 * cost) grouped by AGE_REF, UCC
     age_spend_final_wt_pipe['TOT_SPEND'] = age_spend_final_wt_pipe['FINLWT21'] * age_spend_final_wt_pipe['COST']
-
-    age_ucc_spend_pipe = age_spend_final_wt_pipe.groupby(['AGE_REF', 'UCC'])['TOT_SPEND'].sum()
-    age_ucc_spend_pipe = age_ucc_spend_pipe.to_frame()
-    age_ucc_spend_pipe.reset_index(drop=False, inplace=True)
-
+    age_ucc_spend_pipe = age_spend_final_wt_pipe.groupby(['AGE_REF', 'UCC'], as_index=False)['TOT_SPEND'].sum()
     age_ucc_spend_pipe = pd.merge(age_ucc_spend_pipe, final_wt_pipe, on='AGE_REF')
 
-    # Divide by sum fnlwt by age calculated above
+    # Divide sum (FINLWT21 * COST) by sum (FINLWT21) calculated above
     age_ucc_spend_pipe['AVG_SPEND'] = ((age_ucc_spend_pipe['TOT_SPEND'] / age_ucc_spend_pipe['FINLWT21']) * 20).round(2)
     print(age_ucc_spend_pipe)
 
@@ -113,4 +101,5 @@ def concat_data_for_type(_type, _year_folders):
     return final_pipe
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()
