@@ -84,6 +84,12 @@ def process_mtbi_data_files(_years):
 
     # Calcuate the average spend by dividing Sum(FINLWT21 * COST) by the denominator Sum(FINLWT21) grouped by AGE_REF
     monthly_age_ucc_spend_pipe['AVG_SPEND'] = ((monthly_age_ucc_spend_pipe['WT_COST'] / monthly_age_ucc_spend_pipe['SUM_FINLWT21']) * 20).round(2)
+
+    monthly_age_ucc_spend_pipe.drop(columns='SUM_FINLWT21', inplace=True)
+
+    # Filter rows with AGE_REF >= 20 and AGE_REF <= 80
+    monthly_age_ucc_spend_pipe = monthly_age_ucc_spend_pipe[
+        (monthly_age_ucc_spend_pipe['AGE_REF'] >= 20) & (monthly_age_ucc_spend_pipe['AGE_REF'] <= 80)]
     print(monthly_age_ucc_spend_pipe)
 
     # Export processed data
@@ -147,6 +153,9 @@ def process_fmli_data_files(_years):
         spend_pipe.drop(columns='WT_' + key, inplace=True)
 
     spend_pipe.drop(columns='SUM_FINLWT21', inplace=True)
+
+    # Filter rows with AGE_REF >= 20 and AGE_REF <= 80
+    spend_pipe = spend_pipe[(spend_pipe['AGE_REF'] >= 20) & (spend_pipe['AGE_REF'] <= 80)]
     print(spend_pipe)
 
     # Export processed data
