@@ -4,6 +4,7 @@
 import wget
 import os
 import config
+import constants
 
 
 def main():
@@ -15,8 +16,8 @@ def main():
 
     print("\nDownload Path: {}".format(config.DATA_FILES_PATH))
 
-    download_data_files(config.INTERVIEW_FILES)
-    download_data_files(config.DIARY_FILES)
+    download_data_files(constants.INTERVIEW_FILES)
+    download_data_files(constants.DIARY_FILES)
 
 
 def change_folder(_name):
@@ -30,12 +31,12 @@ def change_folder(_name):
 
 def download_data_files(_type):
     # Setup for data file types
-    if _type == config.INTERVIEW_FILES:
+    if _type == constants.INTERVIEW_FILES:
         change_folder('interview')
-        download_files_list = config.INTERVIEW_FILES.values()
-    elif _type == config.DIARY_FILES:
+        download_files_list = constants.INTERVIEW_FILES.values()
+    elif _type == constants.DIARY_FILES:
         change_folder('diary')
-        download_files_list = config.DIARY_FILES.values()
+        download_files_list = constants.DIARY_FILES.values()
 
     # Download all the data files
     for file in download_files_list:

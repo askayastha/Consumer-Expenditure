@@ -4,7 +4,7 @@
 import sys
 import re
 import os
-import config
+import constants
 
 
 def main():
@@ -48,15 +48,15 @@ def print_jobs_list():
     print("\nCONSUMER EXPENDITURE SURVEY")
     print("***************************")
 
-    for key in config.JOBS_DESC.keys():
-        print("{}. {}".format(key, config.JOBS_DESC[key]))
+    for key in constants.JOBS_DESC.keys():
+        print("{}. {}".format(key, constants.JOBS_DESC[key]))
 
     print("\nPlease specify a job number to run. (eg. 1 or 1,2,3 or 1-3 etc.) ?")
 
 
 def run_jobs(_jobs_list):
     for job_num in _jobs_list:
-        job = config.JOBS.get(int(job_num))
+        job = constants.JOBS.get(int(job_num))
 
         if job is None:
             sys.exit() if job_num == '5' else print("The job(s) that you specified doesn't exist. Please enter valid job number(s)!!!\n")
@@ -64,9 +64,9 @@ def run_jobs(_jobs_list):
             job_success = os.system(job)
 
             if job_success == 0:  # Checks for job success
-                print("\n{} was successful.".format(config.JOBS_DESC[int(job_num)]))
+                print("\n{} was successful.".format(constants.JOBS_DESC[int(job_num)]))
             else:
-                print("\n{} was not successful.".format(config.JOBS_DESC[int(job_num)]))
+                print("\n{} was not successful.".format(constants.JOBS_DESC[int(job_num)]))
                 sys.exit()
 
 

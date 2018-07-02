@@ -4,6 +4,7 @@
 import pandas as pd
 import os
 import config
+import constants
 import utils
 from datetime import datetime
 
@@ -23,7 +24,7 @@ YEAR_BUCKET_MULTIPLIER = config.YEAR_BUCKET_MULTIPLIERS[config.YEAR_BUCKET]
 
 
 def main():
-    years = list(config.INTERVIEW_FILES.keys())
+    years = list(constants.INTERVIEW_FILES.keys())
     start_year = years[0]
     end_year = years[-1]
 
@@ -51,7 +52,7 @@ def process_mtbi_data_files(_years):
     print("\n***** PROCESSING MTBI DATA FROM {} TO {} *****".format(start_year, end_year))
     year_folders = []
     for year in _years:
-        year_folders.append(config.INTERVIEW_FILES[year])
+        year_folders.append(constants.INTERVIEW_FILES[year])
 
     fmli_pipe = concat_data_for_type('fmli', year_folders)
     mtbi_pipe = concat_data_for_type('mtbi', year_folders)
@@ -117,7 +118,7 @@ def process_fmli_data_files(_years):
     print("\n***** PROCESSING FMLI DATA FROM {} TO {} *****".format(start_year, end_year))
     year_folders = []
     for year in _years:
-        year_folders.append(config.INTERVIEW_FILES[year])
+        year_folders.append(constants.INTERVIEW_FILES[year])
 
     fmli_pipe = concat_data_for_type('fmli', year_folders)
 

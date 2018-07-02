@@ -9,18 +9,18 @@ import utils
 
 
 def main():
-    extract_data_files(config.INTERVIEW_FILES)
-    extract_data_files(config.DIARY_FILES)
+    extract_data_files(constants.INTERVIEW_FILES)
+    extract_data_files(constants.DIARY_FILES)
 
 
 def extract_data_files(_type):
     # Setup for data file types
-    if _type == config.INTERVIEW_FILES:
+    if _type == constants.INTERVIEW_FILES:
         data_files_path = os.path.join(config.DATA_FILES_PATH, 'interview')
         extract_files_path = os.path.join(data_files_path, config.EXTRACT_FOLDER_NAME)
         utils.make_folder(extract_files_path)
         extract_file_types = constants.EXTRACT_INTERVIEW_FILE_TYPES
-    elif _type == config.DIARY_FILES:
+    elif _type == constants.DIARY_FILES:
         data_files_path = os.path.join(config.DATA_FILES_PATH, 'diary')
         extract_files_path = os.path.join(data_files_path, config.EXTRACT_FOLDER_NAME)
         utils.make_folder(extract_files_path)
