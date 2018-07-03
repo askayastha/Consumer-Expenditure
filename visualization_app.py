@@ -10,7 +10,8 @@ import config
 import constants
 import os
 
-app = dash.Dash()
+app = dash.Dash(__name__)
+server = app.server
 
 # test_pipe = pd.read_csv(os.path.join(config.DATA_FILES_PATH, "processed_data_{}yrs_bucket_jun26/mtbi_avg_spend_intrvw_2011_to_2015.csv".format(5)))
 ucc_pipe = pd.read_csv(os.path.join(config.DATA_FILES_PATH, "ucc_data_dictionary.csv"))
@@ -172,4 +173,4 @@ def update_graph(ucc_value, bucket_value, year_slider_value):
 
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)
