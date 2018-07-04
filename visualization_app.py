@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 from scipy.interpolate import UnivariateSpline
+from scipy.signal.windows import gaussian
+from scipy.ndimage import filters
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -60,6 +62,13 @@ app.layout = html.Div([
     ], style={'margin-left': '10%', 'margin-right': '10%'})
 
 ])
+
+
+def moving_average(series, sigma=3):
+    b = gaussian(39, sigma)
+    average = filters.convolve1d(series, b/b.sum())
+    var = filters.convolve1d(np.power(series-average, 2), b/b.sum())
+    return average, var
 
 
 def year_bucket_files(years_bucket):
@@ -130,13 +139,15 @@ def update_graph(ucc_value, bucket_value, year_slider_value):
     x = filtered_pipe['AGE_REF']
     y = filtered_pipe['AVG_SPEND']
 
-    for i in range(0, 99999999, 10000):
-        u_spline = UnivariateSpline(x, y, s=i)
-        knot_count = len(u_spline.get_knots())
-        # print(knot_count)
-        if knot_count <= 8:
-            break
-    # u_spline = UnivariateSpline(x, y, s=10000)
+    # for i in range(0, 99999999, 10000):
+    #     u_spline = UnivariateSpline(x, y, s=i)
+    #     knot_count = len(u_spline.get_knots())
+    #     # print(knot_count)
+    #     if knot_count <= 8:
+    #         break
+
+    _, var = moving_average(y)
+    u_spline = UnivariateSpline(x, y, w=1/np.sqrt(var))
     xs = np.linspace(20, 80, 1000)
 
     return {
