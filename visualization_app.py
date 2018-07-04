@@ -39,7 +39,7 @@ app.layout = html.Div([
         dcc.Dropdown(
             id='dropdown-ucc',
             options=[{'label': val, 'value': key} for key, val in ucc_dict.items()],
-            value=ucc_pipe['UCC'][0]
+            value=ucc_pipe['UCC'][176]
         ),
         html.Br(),
         html.Label('Bucket'),
