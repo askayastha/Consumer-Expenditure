@@ -77,18 +77,18 @@ JOBS_DESC = {
 
 # MTBI Files Dictionary
 AVG_SPEND_FILES_3_YEAR = {
-    "1996-1998": "mtbi_avg_spend_intrvw_1996_to_1998",
-    "1999-2001": "mtbi_avg_spend_intrvw_1999_to_2001",
-    "2002-2004": "mtbi_avg_spend_intrvw_2002_to_2004",
-    "2005-2007": "mtbi_avg_spend_intrvw_2005_to_2007",
-    "2008-2010": "mtbi_avg_spend_intrvw_2008_to_2010",
-    "2011-2013": "mtbi_avg_spend_intrvw_2011_to_2013",
-    "2014-2016": "mtbi_avg_spend_intrvw_2014_to_2016",
+    "1996-1998": "avg_spend_intrvw_1996_to_1998",
+    "1999-2001": "avg_spend_intrvw_1999_to_2001",
+    "2002-2004": "avg_spend_intrvw_2002_to_2004",
+    "2005-2007": "avg_spend_intrvw_2005_to_2007",
+    "2008-2010": "avg_spend_intrvw_2008_to_2010",
+    "2011-2013": "avg_spend_intrvw_2011_to_2013",
+    "2014-2016": "avg_spend_intrvw_2014_to_2016",
 }
 
 AVG_SPEND_FILES_5_YEAR = {
-    "1996-2000": "mtbi_avg_spend_intrvw_1996_to_2000",
-    "2001-2005": "mtbi_avg_spend_intrvw_2001_to_2005",
-    "2006-2010": "mtbi_avg_spend_intrvw_2006_to_2010",
-    "2011-2015": "mtbi_avg_spend_intrvw_2011_to_2015"
+    "1996-2000": "avg_spend_intrvw_1996_to_2000",
+    "2001-2005": "avg_spend_intrvw_2001_to_2005",
+    "2006-2010": "avg_spend_intrvw_2006_to_2010",
+    "2011-2015": "avg_spend_intrvw_2011_to_2015"
 }
