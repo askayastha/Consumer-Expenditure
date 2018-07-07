@@ -1,5 +1,6 @@
 import pandas as pd
 import config
+import constants
 from datetime import datetime
 import os
 
@@ -17,7 +18,7 @@ ucc_pipes = []
 
 
 def main():
-    years = list(config.INTERVIEW_FILES.keys())
+    years = list(constants.INTERVIEW_FILES.keys())
     start_year = years[0]
     end_year = years[-1]
 
@@ -34,6 +35,9 @@ def main():
     final_ucc_pipe.insert(1, 'UCC_DESCRIPTION', final_ucc_pipe['UCC_DESC'])
     final_ucc_pipe.drop(columns='UCC_DESC', inplace=True)
 
+    # Replace double quotes with single quote
+    final_ucc_pipe['UCC_DESCRIPTION'] = final_ucc_pipe['UCC_DESCRIPTION'].str.replace("''", "'")
+
     # Export UCC data dictionary
     export_file = os.path.join(config.DATA_FILES_PATH,
                                "ucc_data_dictionary.csv")
@@ -48,7 +52,7 @@ def main():
 
 def process_data_files(_year):
     print("\n***** PROCESSING DATA FOR {} *****".format(_year))
-    mtbi_pipe = concat_data_for_type('mtbi', [config.INTERVIEW_FILES[_year]])
+    mtbi_pipe = concat_data_for_type('mtbi', [constants.INTERVIEW_FILES[_year]])
     ucc_pipes.append(mtbi_pipe['UCC'])
 
 
