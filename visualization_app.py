@@ -24,14 +24,14 @@ fmli_dict = pd.Series(fmli_category_pipe['CAT_DESCRIPTION'].values, index=fmli_c
 
 app.layout = html.Div([
     html.Div([
-        html.H3('Consumer Expenditure Survey'),
-        html.Label('Expense Category'),
+        html.H3('Consumer Expenditure Survey', style={'textAlign': 'center'}),
+        html.Label('Expense Category', style={'fontWeight': '600'}),
         dcc.Dropdown(
             id='dropdown-category'
         ),
         html.Br(),
         html.Div([
-            html.Label('File Type'),
+            html.Label('File Type', style={'fontWeight': '600'}),
             dcc.RadioItems(
                 id='file-type',
                 options=[{'label': i, 'value': i.lower()} for i in ['MTBI', 'FMLI']],
@@ -40,7 +40,7 @@ app.layout = html.Div([
             )
         ], style={'width': '50%', 'display': 'inline-block'}),
         html.Div([
-            html.Label('Bucket'),
+            html.Label('Bucket', style={'fontWeight': '600'}),
             dcc.RadioItems(
                 id='years-bucket',
                 options=[{'label': i + ' Years', 'value': i} for i in ['3', '5']],
