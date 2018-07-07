@@ -15,28 +15,14 @@ import os
 app = dash.Dash(__name__)
 server = app.server
 
-# test_pipe = pd.read_csv(os.path.join(config.DATA_FILES_PATH, "processed_data_{}yrs_bucket_jun26/mtbi_avg_spend_intrvw_2011_to_2015.csv".format(5)))
 ucc_pipe = pd.read_csv(os.path.join(config.DATA_FILES_PATH, "ucc_data_dictionary.csv"))
-
 ucc_pipe['UCC_DESCRIPTION'].fillna(ucc_pipe['UCC'].astype(str), inplace=True)
 ucc_dict = pd.Series(ucc_pipe['UCC_DESCRIPTION'].values, index=ucc_pipe['UCC']).to_dict()
-
-# test_pipe = test_pipe[test_pipe['UCC'] == 830101]
-# x = test_pipe['AGE_REF']
-# y = test_pipe['AVG_SPEND']
-#
-# for i in range(0, 99999999, 1000):
-#     u_spline = UnivariateSpline(x, y, s=i)
-#     knot_count = len(u_spline.get_knots())
-#     print(knot_count)
-#     if knot_count <= 8:
-#         break
-# xs = np.linspace(20, 80, 1000)
 
 
 app.layout = html.Div([
     html.Div([
-        html.H1('Consumer Expenditure Survey'),
+        html.H2('Consumer Expenditure Survey'),
         html.Label('Expense Category'),
         dcc.Dropdown(
             id='dropdown-ucc',
@@ -64,6 +50,11 @@ app.layout = html.Div([
 ])
 
 
+app.css.append_css({
+    'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'
+})
+
+
 def moving_average(series, sigma=3):
     b = gaussian(39, sigma)
     average = filters.convolve1d(series, b/b.sum())
@@ -74,9 +65,9 @@ def moving_average(series, sigma=3):
 def year_bucket_files(years_bucket):
     years_bucket = int(years_bucket)
     if years_bucket == 3:
-        return constants.MTBI_FILES_3_YEAR
+        return constants.AVG_SPEND_FILES_3_YEAR
     elif years_bucket == 5:
-        return constants.MTBI_FILES_5_YEAR
+        return constants.AVG_SPEND_FILES_5_YEAR
 
 
 @app.callback(
@@ -138,13 +129,6 @@ def update_graph(ucc_value, bucket_value, year_slider_value):
     # print(filtered_pipe)
     x = filtered_pipe['AGE_REF']
     y = filtered_pipe['AVG_SPEND']
-
-    # for i in range(0, 99999999, 10000):
-    #     u_spline = UnivariateSpline(x, y, s=i)
-    #     knot_count = len(u_spline.get_knots())
-    #     # print(knot_count)
-    #     if knot_count <= 8:
-    #         break
 
     _, var = moving_average(y)
     u_spline = UnivariateSpline(x, y, w=1/np.sqrt(var))

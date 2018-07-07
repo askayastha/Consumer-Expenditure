@@ -76,7 +76,7 @@ JOBS_DESC = {
 }
 
 # MTBI Files Dictionary
-MTBI_FILES_3_YEAR = {
+AVG_SPEND_FILES_3_YEAR = {
     "1996-1998": "mtbi_avg_spend_intrvw_1996_to_1998",
     "1999-2001": "mtbi_avg_spend_intrvw_1999_to_2001",
     "2002-2004": "mtbi_avg_spend_intrvw_2002_to_2004",
@@ -86,7 +86,7 @@ MTBI_FILES_3_YEAR = {
     "2014-2016": "mtbi_avg_spend_intrvw_2014_to_2016",
 }
 
-MTBI_FILES_5_YEAR = {
+AVG_SPEND_FILES_5_YEAR = {
     "1996-2000": "mtbi_avg_spend_intrvw_1996_to_2000",
     "2001-2005": "mtbi_avg_spend_intrvw_2001_to_2005",
     "2006-2010": "mtbi_avg_spend_intrvw_2006_to_2010",
