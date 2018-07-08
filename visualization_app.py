@@ -36,7 +36,7 @@ app.layout = html.Div([
                 id='file-type',
                 options=[{'label': i, 'value': i.lower()} for i in ['MTBI', 'FMLI']],
                 value='mtbi',
-                labelStyle={'display': 'inline-block'}
+                labelStyle={'marginRight': '20px', 'display': 'inline-block'}
             )
         ], style={'width': '50%', 'display': 'inline-block'}),
         html.Div([
@@ -45,7 +45,7 @@ app.layout = html.Div([
                 id='years-bucket',
                 options=[{'label': i + ' Years', 'value': i} for i in ['3', '5']],
                 value='3',
-                labelStyle={'display': 'inline-block'}
+                labelStyle={'marginRight': '20px', 'display': 'inline-block'}
             )
         ], style={'width': '50%', 'float': 'right', 'display': 'inline-block'}),
 
