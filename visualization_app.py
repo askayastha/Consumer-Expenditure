@@ -11,6 +11,7 @@ from dash.dependencies import Input, Output
 import config
 import constants
 import os
+import pickle
 
 app = dash.Dash(__name__)
 server = app.server
@@ -69,13 +70,6 @@ app.css.append_css({
 })
 
 
-def moving_average(series, sigma=3):
-    b = gaussian(39, sigma)
-    average = filters.convolve1d(series, b/b.sum())
-    var = filters.convolve1d(np.power(series-average, 2), b/b.sum())
-    return average, var
-
-
 def year_bucket_files(years_bucket):
     years_bucket = int(years_bucket)
     if years_bucket == 3:
@@ -89,6 +83,16 @@ def category_dict_for_file(file_type):
         return ucc_dict
     elif file_type == 'fmli':
         return fmli_dict
+
+
+def spline_dict_for_file(file_type, part_file_name):
+    file_name = "{}_{}_{}.pkl".format(file_type, 'spline', part_file_name)
+    file_path = os.path.join(config.SPLINES_FOLDER_PATH, file_name)
+
+    with open(file_path, 'rb') as file:
+        spline_dict = pickle.load(file)
+
+    return spline_dict
 
 
 @app.callback(
@@ -157,7 +161,10 @@ def update_graph(category_value, file_type, bucket_value, year_slider_value):
     elif file_type == 'fmli':
         filtered_pipe = avg_spend_pipe[['AGE_REF', category_value]]
 
-    if filtered_pipe.empty:
+    spline_dict = spline_dict_for_file(file_type, part_file_name)
+    u_spline = spline_dict[category_value]
+
+    if filtered_pipe.empty or u_spline is None:
         print("***** NO DATA *****")
         return {
             'data': [],
@@ -174,8 +181,6 @@ def update_graph(category_value, file_type, bucket_value, year_slider_value):
     x = filtered_pipe['AGE_REF']
     y = filtered_pipe['AVG_SPEND'] if file_type == 'mtbi' else filtered_pipe[category_value]
 
-    _, var = moving_average(y)
-    u_spline = UnivariateSpline(x, y, w=1/np.sqrt(var))
     xs = np.linspace(20, 80, 1000)
 
     return {
