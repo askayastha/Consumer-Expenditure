@@ -143,8 +143,8 @@ def update_graph(category_value, file_type, bucket_size, year_slider_value):
             'data': [],
             'layout': go.Layout(
                 title='NO DATA!',
-                xaxis={'type': 'linear', 'title': 'Age in Years'},
-                yaxis={'title': 'Average Spend in $'},
+                xaxis={'type': 'linear', 'title': 'Age (Years)'},
+                yaxis={'title': 'Average Spend ($)'},
                 margin={'l': 80, 'b': 70, 't': 50, 'r': 20},
                 legend={'x': 0, 'y': 1},
                 hovermode='closest'
@@ -182,8 +182,8 @@ def update_graph(category_value, file_type, bucket_size, year_slider_value):
             ],
             'layout': go.Layout(
                 title=utils.category_dict_for_file(file_type)[category_value],
-                xaxis={'type': 'linear', 'title': 'Age in Years'},
-                yaxis={'title': 'Average Spend in $'},
+                xaxis={'type': 'linear', 'title': 'Age (Years)'},
+                yaxis={'title': 'Average Spend ($)'},
                 margin={'l': 80, 'b': 70, 't': 50, 'r': 20},
                 legend={'x': 0, 'y': 1},
                 hovermode='closest'
