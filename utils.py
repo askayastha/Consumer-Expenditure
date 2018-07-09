@@ -25,10 +25,10 @@ def make_folder(_files_path):
         os.mkdir(_files_path)
 
 
-def avg_spend_files_for_bucket(year_bucket):
-    if year_bucket == '3':
+def avg_spend_files_for_bucket(bucket_size):
+    if bucket_size == '3':
         return constants.AVG_SPEND_FILES_3_YEAR
-    elif year_bucket == '5':
+    elif bucket_size == '5':
         return constants.AVG_SPEND_FILES_5_YEAR
 
 

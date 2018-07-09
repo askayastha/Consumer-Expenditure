@@ -59,7 +59,7 @@ def run_jobs(_jobs_list):
         job = constants.JOBS.get(int(job_num))
 
         if job is None:
-            sys.exit() if job_num == '5' else print("The job(s) that you specified doesn't exist. Please enter valid job number(s)!!!\n")
+            sys.exit() if job_num == str(list(constants.JOBS_DESC.keys())[-1]) else print("The job(s) that you specified doesn't exist. Please enter valid job number(s)!!!\n")
         else:
             job_success = os.system(job)
 

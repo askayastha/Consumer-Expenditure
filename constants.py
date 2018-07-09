@@ -6,11 +6,6 @@ PUMD_DATA_FILE_TYPES = ['interview', 'diary']
 EXTRACT_INTERVIEW_FILE_TYPES = ['fmli', 'mtbi']
 EXTRACT_DIARY_FILE_TYPES = ['fmld', 'expd']
 
-# Scripts
-DOWNLOAD_SCRIPT = "download_data_files.py"
-EXTRACT_SCRIPT = "extract_data_files.py"
-PROCESS_INTERVIEW_SCRIPT = "process_interview_data_files.py"
-PROCESS_DIARY_SCRIPT = "process_diary_data_files.py"
 
 INTERVIEW_FILES = {
     1996: "intrvw96",
@@ -60,20 +55,36 @@ DIARY_FILES = {
     2016: "diary16"
 }
 
+
+# Scripts
+DOWNLOAD_SCRIPT = "download_data_files.py"
+EXTRACT_SCRIPT = "extract_data_files.py"
+PROCESS_INTERVIEW_SCRIPT = "process_interview_data_files.py"
+PROCESS_DIARY_SCRIPT = "process_diary_data_files.py"
+PROCESS_DATA_DICTIONARY = "process_data_dictionary.py"
+PROCESS_SPLINES = "process_splines.py"
+
+
 JOBS = {
     1: "python3 {}".format(DOWNLOAD_SCRIPT),
     2: "python3 {}".format(EXTRACT_SCRIPT),
     3: "python3 {}".format(PROCESS_INTERVIEW_SCRIPT),
-    4: "python3 {}".format(PROCESS_DIARY_SCRIPT)
+    4: "python3 {}".format(PROCESS_DIARY_SCRIPT),
+    5: "python3 {}".format(PROCESS_DATA_DICTIONARY),
+    6: "python3 {}".format(PROCESS_SPLINES)
 }
+
 
 JOBS_DESC = {
     1: "Download CE data files",
     2: "Extract CE data files",
     3: "Process CE Interview data",
     4: "Process CE Diary data",
-    5: "Quit"
+    5: "Process CE data dictionary",
+    6: "Process CE splines",
+    7: "Quit"
 }
+
 
 # MTBI Files Dictionary
 AVG_SPEND_FILES_3_YEAR = {
@@ -85,6 +96,7 @@ AVG_SPEND_FILES_3_YEAR = {
     "2011-2013": "avg_spend_intrvw_2011_to_2013",
     "2014-2016": "avg_spend_intrvw_2014_to_2016",
 }
+
 
 AVG_SPEND_FILES_5_YEAR = {
     "1996-2000": "avg_spend_intrvw_1996_to_2000",
