@@ -50,8 +50,8 @@ app.layout = html.Div([
             html.Label('Graph', style={'fontWeight': '600'}),
             dcc.RadioItems(
                 id='graph-type',
-                options=[{'label': i, 'value': i.lower().replace(' ', '-')} for i in ['Individual Year', 'All Years']],
-                value='individual-year',
+                options=[{'label': i, 'value': i.lower().replace(' ', '-')} for i in ['Individual Bucket', 'All Buckets']],
+                value='individual-bucket',
                 labelStyle={'marginRight': '20px', 'display': 'inline-block'}
             )
         ], style={'width': '33%', 'float': 'right', 'display': 'inline-block'})
@@ -125,7 +125,7 @@ def update_slider_marks(bucket_size):
     [Input('year-slider', 'value')]
 )
 def update_graph_type_value(year_slider):
-    return 'individual-year'
+    return 'individual-bucket'
 
 
 @app.callback(
@@ -154,7 +154,7 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
     spline_dict = utils.spline_dict_for_file(file_type, part_file_name)
     u_spline = spline_dict[category_value]
 
-    if graph_type == 'individual-year' and (filtered_pipe.empty or u_spline is None):
+    if graph_type == 'individual-bucket' and (filtered_pipe.empty or u_spline is None):
         print("***** NO DATA *****")
         return {
             'data': [],
@@ -175,11 +175,11 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
     # u_spline = UnivariateSpline(x, y, w=1 / np.sqrt(var))
     xs = np.linspace(20, 80, 1000)
 
-    if graph_type == 'individual-year':
+    if graph_type == 'individual-bucket':
         return {
             'data': [
                 go.Scatter(
-                    name="Dot Plot",
+                    name="Scatter Plot",
                     x=x,
                     y=y,
                     # text="testtest",
@@ -191,7 +191,7 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
                     }
                 ),
                 go.Scatter(
-                    name="Spline",
+                    name=slider_label,
                     x=xs,
                     y=u_spline(xs),
                     mode="lines",
@@ -208,7 +208,7 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
             )
         }
 
-    elif graph_type == 'all-years':
+    elif graph_type == 'all-buckets':
         traces = []
         for spline_label, part_file_name in utils.avg_spend_files_for_bucket(bucket_size).items():
             spline_dict = utils.spline_dict_for_file(file_type, part_file_name)
