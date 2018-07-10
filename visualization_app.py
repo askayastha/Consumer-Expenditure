@@ -8,7 +8,6 @@ import plotly.graph_objs as go
 from dash.dependencies import Input, Output
 import config
 import os
-import process_splines
 import utils
 
 app = dash.Dash(__name__)
@@ -23,7 +22,7 @@ fmli_dict = pd.Series(fmli_category_pipe['CAT_DESCRIPTION'].values, index=fmli_c
 
 app.layout = html.Div([
     html.Div([
-        html.H3('Consumer Expenditure Survey', style={'textAlign': 'center'}),
+        html.H3('Consumer Expenditure Survey', style={'textAlign': 'center', 'fontWeight': '600'}),
         html.Label('Expense Category', style={'fontWeight': '600'}),
         dcc.Dropdown(
             id='dropdown-category'
@@ -37,16 +36,25 @@ app.layout = html.Div([
                 value='mtbi',
                 labelStyle={'marginRight': '20px', 'display': 'inline-block'}
             )
-        ], style={'width': '50%', 'display': 'inline-block'}),
+        ], style={'width': '33%', 'display': 'inline-block'}),
         html.Div([
             html.Label('Bucket Size', style={'fontWeight': '600'}),
             dcc.RadioItems(
                 id='bucket-size',
-                options=[{'label': i + ' Years', 'value': i} for i in ['3', '5']],
+                options=[{'label': i + ' Years', 'value': i} for i in ['3']],
                 value='3',
                 labelStyle={'marginRight': '20px', 'display': 'inline-block'}
             )
-        ], style={'width': '50%', 'float': 'right', 'display': 'inline-block'}),
+        ], style={'width': '33%', 'display': 'inline-block'}),
+        html.Div([
+            html.Label('Graph', style={'fontWeight': '600'}),
+            dcc.RadioItems(
+                id='graph-type',
+                options=[{'label': i, 'value': i.lower().replace(' ', '-')} for i in ['Individual Year', 'All Years']],
+                value='individual-year',
+                labelStyle={'marginRight': '20px', 'display': 'inline-block'}
+            )
+        ], style={'width': '33%', 'float': 'right', 'display': 'inline-block'})
 
     ], style={'width': '100%', 'display': 'inline-block'}),
     html.Br(),
@@ -113,13 +121,22 @@ def update_slider_marks(bucket_size):
 
 
 @app.callback(
+    Output('graph-type', 'value'),
+    [Input('year-slider', 'value')]
+)
+def update_graph_type_value(year_slider):
+    return 'individual-year'
+
+
+@app.callback(
     Output('age-vs-spend', 'figure'),
     [Input('dropdown-category', 'value'),
      Input('file-type', 'value'),
      Input('bucket-size', 'value'),
+     Input('graph-type', 'value'),
      Input('year-slider', 'value')]
 )
-def update_graph(category_value, file_type, bucket_size, year_slider_value):
+def update_graph(category_value, file_type, bucket_size, graph_type, year_slider_value):
     print("**** Category Value: {} *****".format(category_value))
 
     slider_label = list(utils.avg_spend_files_for_bucket(bucket_size).keys())[int(year_slider_value)]
@@ -134,17 +151,17 @@ def update_graph(category_value, file_type, bucket_size, year_slider_value):
     elif file_type == 'fmli':
         filtered_pipe = avg_spend_pipe[['AGE_REF', category_value]]
 
-    # spline_dict = spline_dict_for_file(file_type, part_file_name)
-    # u_spline = spline_dict[category_value]
+    spline_dict = utils.spline_dict_for_file(file_type, part_file_name)
+    u_spline = spline_dict[category_value]
 
-    if filtered_pipe.empty:
+    if graph_type == 'individual-year' and (filtered_pipe.empty or u_spline is None):
         print("***** NO DATA *****")
         return {
             'data': [],
             'layout': go.Layout(
                 title='NO DATA!',
                 xaxis={'type': 'linear', 'title': 'Age (Years)'},
-                yaxis={'title': 'Average Spend ($)'},
+                yaxis={'title': 'Average ($)'},
                 margin={'l': 80, 'b': 70, 't': 50, 'r': 20},
                 legend={'x': 0, 'y': 1},
                 hovermode='closest'
@@ -154,11 +171,12 @@ def update_graph(category_value, file_type, bucket_size, year_slider_value):
     x = filtered_pipe['AGE_REF']
     y = filtered_pipe['AVG_SPEND'] if file_type == 'mtbi' else filtered_pipe[category_value]
 
-    _, var = process_splines.moving_average(y)
-    u_spline = UnivariateSpline(x, y, w=1 / np.sqrt(var))
+    # _, var = process_splines.moving_average(y)
+    # u_spline = UnivariateSpline(x, y, w=1 / np.sqrt(var))
     xs = np.linspace(20, 80, 1000)
 
-    return {
+    if graph_type == 'individual-year':
+        return {
             'data': [
                 go.Scatter(
                     name="Dot Plot",
@@ -183,12 +201,40 @@ def update_graph(category_value, file_type, bucket_size, year_slider_value):
             'layout': go.Layout(
                 title=utils.category_dict_for_file(file_type)[category_value],
                 xaxis={'type': 'linear', 'title': 'Age (Years)'},
-                yaxis={'title': 'Average Spend ($)'},
+                yaxis={'title': 'Average ($)'},
                 margin={'l': 80, 'b': 70, 't': 50, 'r': 20},
                 legend={'x': 0, 'y': 1},
                 hovermode='closest'
             )
         }
+
+    elif graph_type == 'all-years':
+        traces = []
+        for spline_label, part_file_name in utils.avg_spend_files_for_bucket(bucket_size).items():
+            spline_dict = utils.spline_dict_for_file(file_type, part_file_name)
+
+            if spline_dict[category_value] is not None:
+                traces.append(
+                    go.Scatter(
+                        name=spline_label,
+                        x=xs,
+                        y=spline_dict[category_value](xs),
+                        mode="lines",
+                        opacity=1.0
+                        # line={'width': 1}
+                    )
+                )
+
+        layout = go.Layout(
+            title=utils.category_dict_for_file(file_type)[category_value],
+            xaxis={'type': 'linear', 'title': 'Age (Years)'},
+            yaxis={'title': 'Average ($)'},
+            margin={'l': 80, 'b': 70, 't': 50, 'r': 20},
+            legend={'x': 0, 'y': 1},
+            hovermode='closest'
+        )
+
+        return {'data': traces, 'layout': layout}
 
 
 if __name__ == '__main__':
