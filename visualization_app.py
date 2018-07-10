@@ -23,10 +23,26 @@ fmli_dict = pd.Series(fmli_category_pipe['CAT_DESCRIPTION'].values, index=fmli_c
 app.layout = html.Div([
     html.Div([
         html.H3('Consumer Expenditure Survey', style={'textAlign': 'center', 'fontWeight': '600'}),
-        html.Label('Expense Category', style={'fontWeight': '600'}),
-        dcc.Dropdown(
-            id='dropdown-category'
-        ),
+
+        html.Div([
+            html.Label('Expense Category', style={'fontWeight': '600'}),
+            dcc.Dropdown(
+                id='dropdown-category'
+            )
+        ], style={'width': '69%', 'display': 'inline-block'}),
+        html.Div([
+            html.Label('Sort By', style={'fontWeight': '600'}),
+            dcc.Dropdown(
+                id='dropdown-sort',
+                options=[
+                    {'label': 'Alphabetical: A to Z', 'value': 'asc'},
+                    {'label': 'Alphabetical: Z to A', 'value': 'desc'},
+                    {'label': 'Goodness of Fit', 'value': 'gof'}
+                ],
+                value='asc'
+            )
+        ], style={'width': '29%', 'float': 'right', 'display': 'inline-block'}),
+        html.Br(),
         html.Br(),
         html.Div([
             html.Label('File Type', style={'fontWeight': '600'}),
@@ -54,20 +70,18 @@ app.layout = html.Div([
                 value='individual-bucket',
                 labelStyle={'marginRight': '20px', 'display': 'inline-block'}
             )
-        ], style={'width': '33%', 'float': 'right', 'display': 'inline-block'})
-
-    ], style={'width': '100%', 'display': 'inline-block'}),
-    html.Br(),
-    html.Br(),
-    dcc.Graph(id='age-vs-spend'),
-    html.Div([
-        dcc.Slider(
-            id='year-slider',
-            min=0,
-            step=None
-        )
-    ], style={'margin-left': '10%', 'margin-right': '10%'})
-
+        ], style={'width': '33%', 'float': 'right', 'display': 'inline-block'}),
+        html.Br(),
+        html.Br(),
+        dcc.Graph(id='age-vs-spend'),
+        html.Div([
+            dcc.Slider(
+                id='year-slider',
+                min=0,
+                step=None
+            )
+        ])
+    ], style={'margin-left': '10%', 'margin-right': '10%'}),
 ])
 
 
