@@ -20,7 +20,7 @@ data_dict_pipe.drop_duplicates(inplace=True)
 # data_dict_file = os.path.join(config.EXPORT_FILES_PATH, "data_dict_file.csv")
 # data_dict_pipe.to_csv(data_dict_file)
 
-YEAR_BUCKET_MULTIPLIER = config.YEAR_BUCKET_MULTIPLIERS[config.YEAR_BUCKET]
+YEAR_BUCKET_SIZE_MULTIPLIER = config.YEAR_BUCKET_SIZE_MULTIPLIERS[config.YEAR_BUCKET_SIZE]
 
 
 def main():
@@ -31,10 +31,10 @@ def main():
     start_time = datetime.now()
 
     # Generate years bucket list according to the configuration
-    for year in range(start_year, end_year, config.YEAR_BUCKET):
+    for year in range(start_year, end_year, config.YEAR_BUCKET_SIZE):
         years_bucket = []
 
-        for i in range(config.YEAR_BUCKET):
+        for i in range(config.YEAR_BUCKET_SIZE):
             years_bucket.append(year + i)
         # print(years_bucket)
         process_mtbi_data_files(years_bucket)
@@ -87,7 +87,7 @@ def process_mtbi_data_files(_years):
     monthly_age_ucc_spend_pipe.drop_duplicates(inplace=True)
 
     # Calcuate the average spend by dividing Sum(FINLWT21 * COST) by the denominator Sum(FINLWT21) grouped by AGE_REF
-    monthly_age_ucc_spend_pipe['AVG_SPEND'] = ((monthly_age_ucc_spend_pipe['WT_COST'] / monthly_age_ucc_spend_pipe['SUM_FINLWT21']) * YEAR_BUCKET_MULTIPLIER).round(2)
+    monthly_age_ucc_spend_pipe['AVG_SPEND'] = ((monthly_age_ucc_spend_pipe['WT_COST'] / monthly_age_ucc_spend_pipe['SUM_FINLWT21']) * YEAR_BUCKET_SIZE_MULTIPLIER).round(2)
 
     monthly_age_ucc_spend_pipe.drop(columns='SUM_FINLWT21', inplace=True)
 
@@ -153,7 +153,7 @@ def process_fmli_data_files(_years):
 
     # Calculate the average spend by dividing weighted spend by the denominator Sum(FINLWT21) grouped by AGE_REF
     for key, val in expn_vars_dict.items():
-        spend_pipe[key] = ((spend_pipe['WT_' + key] / spend_pipe['SUM_FINLWT21']) * YEAR_BUCKET_MULTIPLIER).round(2)
+        spend_pipe[key] = ((spend_pipe['WT_' + key] / spend_pipe['SUM_FINLWT21']) * YEAR_BUCKET_SIZE_MULTIPLIER).round(2)
         spend_pipe.drop(columns='WT_' + key, inplace=True)
 
     spend_pipe.drop(columns='SUM_FINLWT21', inplace=True)

@@ -19,10 +19,10 @@ def main():
     start_time = datetime.now()
 
     # Generate years bucket list according to the configuration
-    for year in range(start_year, end_year, config.YEAR_BUCKET):
+    for year in range(start_year, end_year, config.YEAR_BUCKET_SIZE):
         years_bucket = []
 
-        for i in range(config.YEAR_BUCKET):
+        for i in range(config.YEAR_BUCKET_SIZE):
             years_bucket.append(year + i)
         # print(years_bucket)
         process_diary_data_files(years_bucket)
