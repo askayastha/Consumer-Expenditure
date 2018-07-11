@@ -6,6 +6,7 @@ import pandas as pd
 import config
 import constants
 import pickle
+import collections
 
 
 data_files_path = os.path.join(config.DATA_FILES_PATH, 'interview')
@@ -47,6 +48,13 @@ def spline_dict_for_file(file_type, part_file_name):
         spline_dict = pickle.load(file)
 
     return spline_dict
+
+
+def sort_dictionary(dict, sort_value):
+    if sort_value == 'asc':
+        return collections.OrderedDict(sorted(dict.items(), key=lambda t: t[1]))
+    elif sort_value == 'desc':
+        return collections.OrderedDict(sorted(dict.items(), key=lambda t: t[1], reverse=True))
 
 
 def concat_data_for_type(_type, _year_folders):
