@@ -16,6 +16,7 @@ DOWNLOAD_PATH = os.path.expanduser("~")
 DATA_FILES_PATH = os.path.join(DOWNLOAD_PATH, DOWNLOAD_FOLDER_NAME)
 SPLINES_FOLDER_PATH = os.path.join(DATA_FILES_PATH, 'splines')
 GOODNESS_OF_FIT_FOLDER_PATH = os.path.join(DATA_FILES_PATH, 'goodness_of_fit')
+GOODNESS_OF_DATA_FOLDER_PATH = os.path.join(DATA_FILES_PATH, 'goodness_of_data')
 today = datetime.now().strftime('%b%d').lower()
 EXPORT_FILES_PATH = os.path.join(DATA_FILES_PATH, "processed_data_{}yrs_bucket_{}".format(YEAR_BUCKET_SIZE, today))
 
@@ -29,3 +30,7 @@ AGE_THRESHOLDS = {
     "max": 80
 }
 
+GOOD_DATA_AGE_THRESHOLDS = {
+    "min": 30,
+    "max": 60
+}

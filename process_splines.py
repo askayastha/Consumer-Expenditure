@@ -24,28 +24,42 @@ def main():
                 print("\n***** PROCESSING SPLINES FROM FILE: {} *****".format(file_name))
 
                 if file_type == 'mtbi':
-                    gof_pipe = utils.ucc_pipe
+                    gof_pipe = utils.ucc_pipe.copy()
                     gof_pipe['GOODNESS_OF_FIT'] = -1
 
                     for category_value in utils.ucc_dict.keys():
                         filtered_pipe = avg_spend_pipe[avg_spend_pipe['UCC'] == int(category_value)]
+
+                        # Spline
                         spline = calculate_spline(filtered_pipe, file_type, category_value)
                         spline_dict[category_value] = spline
 
+                        # Goodness of Fit
                         gof_value = calculate_goodness_of_fit(filtered_pipe, spline, file_type, category_value)
                         gof_pipe.loc[gof_pipe['UCC'] == category_value, 'GOODNESS_OF_FIT'] = gof_value
 
+                        # Goodness of Data
+                        god_value = utils.check_goodness_of_data(filtered_pipe)
+                        gof_pipe.loc[gof_pipe['UCC'] == category_value, 'GOODNESS_OF_DATA'] = god_value
+
                 elif file_type == 'fmli':
-                    gof_pipe = utils.fmli_category_pipe
+                    gof_pipe = utils.fmli_category_pipe.copy()
                     gof_pipe['GOODNESS_OF_FIT'] = -1
 
                     for category_value in utils.fmli_dict.keys():
                         filtered_pipe = avg_spend_pipe[['AGE_REF', category_value]]
+
+                        # Spline
                         spline = calculate_spline(filtered_pipe, file_type, category_value)
                         spline_dict[category_value] = spline
 
+                        # Goodness of Fit
                         gof_value = calculate_goodness_of_fit(filtered_pipe, spline, file_type, category_value)
                         gof_pipe.loc[gof_pipe['CAT_CODE'] == category_value, 'GOODNESS_OF_FIT'] = gof_value
+
+                        # Goodness of Data
+                        god_value = utils.check_goodness_of_data(filtered_pipe)
+                        gof_pipe.loc[gof_pipe['CAT_CODE'] == category_value, 'GOODNESS_OF_DATA'] = god_value
 
                 # Export pickle files
                 export_pickle_files(file_type, part_file_name, spline_dict)
@@ -59,6 +73,7 @@ def export_goodness_of_fit_files(file_type, gof_pipe, part_file_name):
     gof_file_name = "{}_{}_{}.csv".format(file_type, 'gof', part_file_name)
     gof_file = os.path.join(config.GOODNESS_OF_FIT_FOLDER_PATH, gof_file_name)
     gof_pipe.to_csv(gof_file, index=False)
+    print("Exporting data to {}".format(gof_file))
 
 
 def export_pickle_files(file_type, part_file_name, spline_dict):
@@ -68,6 +83,8 @@ def export_pickle_files(file_type, part_file_name, spline_dict):
 
     with open(spline_file, 'wb') as file:
         pickle.dump(spline_dict, file)
+
+    print("Exporting data to {}".format(spline_file))
 
 
 def calculate_goodness_of_fit(data_pipe, spline, file_type, category_value):

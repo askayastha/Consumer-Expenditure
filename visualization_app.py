@@ -109,7 +109,7 @@ app.css.append_css({
      Input('year-slider', 'value')]
 )
 def update_dropdown_category_options(file_type, bucket_size, sort_value, year_slider_value):
-    category_dict = utils.category_dict_for_file(file_type)
+    category_dict = utils.category_dict_for_file(file_type, bucket_size=bucket_size)
 
     if sort_value == 'asc' or sort_value == 'desc':
         sorted_category_dict = utils.sort_dictionary(category_dict, sort_value)
@@ -121,7 +121,7 @@ def update_dropdown_category_options(file_type, bucket_size, sort_value, year_sl
         file = os.path.join(config.GOODNESS_OF_FIT_FOLDER_PATH, file_name)
 
         gof_pipe = pd.read_csv(file)
-        gof_pipe = gof_pipe[gof_pipe['GOODNESS_OF_FIT'] != -1]
+        gof_pipe = gof_pipe[(gof_pipe['GOODNESS_OF_FIT'] != -1) & gof_pipe['GOODNESS_OF_DATA']]
 
         if file_type == 'mtbi':
             gof_dict = pd.Series(gof_pipe['GOODNESS_OF_FIT'].values, index=gof_pipe['UCC']).to_dict()
@@ -140,10 +140,11 @@ def update_dropdown_category_options(file_type, bucket_size, sort_value, year_sl
 @app.callback(
     Output('dropdown-category', 'value'),
     [Input('file-type', 'value'),
+     Input('bucket-size', 'value'),
      Input('dropdown-sort', 'value')]
 )
-def update_dropdown_category_value(file_type, sort_value):
-    category_dict = utils.category_dict_for_file(file_type)
+def update_dropdown_category_value(file_type, bucket_size, sort_value):
+    category_dict = utils.category_dict_for_file(file_type, bucket_size=bucket_size)
     sorted_category_dict = utils.sort_dictionary(category_dict, sort_value)
 
     return list(sorted_category_dict.keys())[0] if bool(sorted_category_dict) else None
@@ -253,7 +254,8 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
                 yaxis={'title': 'Average ($)'},
                 margin={'l': 80, 'b': 70, 't': 50, 'r': 20},
                 legend={'x': 0, 'y': 1},
-                hovermode='closest'
+                hovermode='closest',
+                showlegend=True
             )
         }
 
@@ -280,7 +282,8 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
             yaxis={'title': 'Average ($)'},
             margin={'l': 80, 'b': 70, 't': 50, 'r': 20},
             legend={'x': 0, 'y': 1},
-            hovermode='closest'
+            hovermode='closest',
+            showlegend=True
         )
 
         return {'data': traces, 'layout': layout}

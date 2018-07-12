@@ -33,11 +33,24 @@ def avg_spend_files_for_bucket(bucket_size):
         return constants.AVG_SPEND_FILES_5_YEAR
 
 
-def category_dict_for_file(file_type):
-    if file_type == 'mtbi':
-        return ucc_dict
-    elif file_type == 'fmli':
-        return fmli_dict
+def category_dict_for_file(file_type, bucket_size=None):
+    if bucket_size is None:
+        if file_type == 'mtbi':
+            return ucc_dict
+        elif file_type == 'fmli':
+            return fmli_dict
+    else:
+        if file_type == 'mtbi':
+            category_pipe = pd.read_csv(os.path.join(config.GOODNESS_OF_DATA_FOLDER_PATH, "{}_god_{}yrs.csv".format(file_type, bucket_size)))
+            filtered_category_pipe = category_pipe[category_pipe['GOODNESS_OF_DATA']]
+            filtered_category_dict = pd.Series(filtered_category_pipe['UCC_DESCRIPTION'].values, index=filtered_category_pipe['UCC']).to_dict()
+
+        elif file_type == 'fmli':
+            category_pipe = pd.read_csv(os.path.join(config.GOODNESS_OF_DATA_FOLDER_PATH, "{}_god_{}yrs.csv".format(file_type, bucket_size)))
+            filtered_category_pipe = category_pipe[category_pipe['GOODNESS_OF_DATA']]
+            filtered_category_dict = pd.Series(filtered_category_pipe['CAT_DESCRIPTION'].values, index=filtered_category_pipe['CAT_CODE']).to_dict()
+
+        return filtered_category_dict
 
 
 def spline_dict_for_file(file_type, part_file_name):
@@ -83,3 +96,11 @@ def concat_data_for_type(_type, _year_folders):
 
     final_pipe = pd.concat(year_pipes, axis=0, sort=False)
     return final_pipe
+
+
+def check_goodness_of_data(data_pipe):
+    data_pipe = data_pipe[(data_pipe['AGE_REF'] >= config.GOOD_DATA_AGE_THRESHOLDS['min']) & (data_pipe['AGE_REF'] <= config.GOOD_DATA_AGE_THRESHOLDS['max'])]
+    age_list = data_pipe['AGE_REF'].tolist()
+    god_age_list = list(range(config.GOOD_DATA_AGE_THRESHOLDS['min'], config.GOOD_DATA_AGE_THRESHOLDS['max'] + 1))
+
+    return True if age_list == god_age_list else False
