@@ -230,7 +230,7 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
                     name="Scatter Plot",
                     x=x,
                     y=y,
-                    # text="testtest",
+                    # text="text",
                     mode='markers',
                     opacity=1.0,
                     marker={
@@ -243,7 +243,8 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
                     x=xs,
                     y=u_spline(xs),
                     mode="lines",
-                    opacity=1.0
+                    opacity=1.0,
+                    line={'shape': 'spline'}
                 )
             ],
             'layout': go.Layout(
@@ -268,8 +269,8 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
                         x=xs,
                         y=spline_dict[category_value](xs),
                         mode="lines",
-                        opacity=1.0
-                        # line={'width': 1}
+                        opacity=1.0,
+                        line={'shape': 'spline'}
                     )
                 )
 
