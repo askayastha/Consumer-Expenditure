@@ -76,7 +76,7 @@ app.layout = html.Div([
             html.Label('Graph', style={'fontWeight': '600'}),
             dcc.RadioItems(
                 id='graph-type',
-                options=[{'label': i, 'value': i.lower().replace(' ', '-')} for i in ['Individual Bucket', 'All Buckets']],
+                options=[{'label': i, 'value': i.lower().replace(' ', '-')} for i in ['Individual Bucket']],
                 value='individual-bucket',
                 inputStyle={'marginRight': '10px'},
                 labelStyle={'marginRight': '20px', 'display': 'inline-block'}
@@ -84,12 +84,18 @@ app.layout = html.Div([
         ], style={'width': '33%', 'float': 'right', 'display': 'inline-block'}),
         html.Br(),
         html.Br(),
-        dcc.Graph(id='age-vs-spend'),
+        dcc.Graph(
+            id='age-vs-spend',
+            config={
+                'displayModeBar': False
+            }
+        ),
         html.Div([
             dcc.Slider(
                 id='year-slider',
                 min=0,
-                step=None
+                step=None,
+                disabled=True
             )
         ])
     ], style={'margin-left': '10%', 'margin-right': '10%'}),
