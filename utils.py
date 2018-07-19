@@ -70,7 +70,7 @@ def sort_dictionary(dict, sort_value):
         return collections.OrderedDict(sorted(dict.items(), key=lambda t: t[1], reverse=True))
 
 
-def concat_data_for_type(_type, _year_folders):
+def concat_data_for_type(_type, _year_folders, extract_files_path):
     year_pipes = []
     for folder_name in _year_folders:
         year_folder_path = os.path.join(extract_files_path, folder_name)

@@ -12,7 +12,7 @@ def main():
 
         for file_type in ['mtbi', 'fmli']:
             for bucket_name, part_file_name in utils.avg_spend_files_for_bucket(bucket_size).items():
-                file_name = "{}_{}_{}.csv".format(file_type, 'gof', part_file_name)
+                file_name = "{}_gof_{}.csv".format(file_type, part_file_name)
                 file = os.path.join(config.GOODNESS_OF_FIT_FOLDER_PATH, file_name)
 
                 gof_pipe = pd.read_csv(file)

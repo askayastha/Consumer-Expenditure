@@ -11,15 +11,6 @@ from datetime import datetime
 data_files_path = os.path.join(config.DATA_FILES_PATH, 'interview')
 extract_files_path = os.path.join(data_files_path, config.EXTRACT_FOLDER_NAME)
 
-data_dict_pipe = pd.read_excel(os.path.join(config.DATA_FILES_PATH, 'ce_source_integrate.xlsx'), skiprows=[0, 1, 2])
-data_dict_pipe.rename(columns={'Description': 'UCC_DESC'}, inplace=True)
-data_dict_pipe = data_dict_pipe.filter(items=['UCC', 'UCC_DESC'])
-data_dict_pipe['UCC'] = pd.to_numeric(data_dict_pipe['UCC'], errors='coerce', downcast='integer')
-data_dict_pipe.dropna(inplace=True)
-data_dict_pipe.drop_duplicates(inplace=True)
-# data_dict_file = os.path.join(config.EXPORT_FILES_PATH, "data_dict_file.csv")
-# data_dict_pipe.to_csv(data_dict_file)
-
 YEAR_BUCKET_SIZE_MULTIPLIER = config.YEAR_BUCKET_SIZE_MULTIPLIERS[config.YEAR_BUCKET_SIZE]
 
 
@@ -37,7 +28,7 @@ def main():
         for i in range(config.YEAR_BUCKET_SIZE):
             years_bucket.append(year + i)
         # print(years_bucket)
-        process_mtbi_data_files(years_bucket)
+        # process_mtbi_data_files(years_bucket)
         process_fmli_data_files(years_bucket)
 
     end_time = datetime.now()
@@ -54,8 +45,8 @@ def process_mtbi_data_files(_years):
     for year in _years:
         year_folders.append(constants.INTERVIEW_FILES[year])
 
-    fmli_pipe = concat_data_for_type('fmli', year_folders)
-    mtbi_pipe = concat_data_for_type('mtbi', year_folders)
+    fmli_pipe = utils.concat_data_for_type('fmli', year_folders, extract_files_path)
+    mtbi_pipe = utils.concat_data_for_type('mtbi', year_folders, extract_files_path)
 
     # age_pipe = fmli_pipe['AGE_REF'].groupby(fmli_pipe['NEWID']).max()
     age_pipe = fmli_pipe.groupby('NEWID', as_index=False)['AGE_REF'].max()
@@ -94,6 +85,7 @@ def process_mtbi_data_files(_years):
     # Filter rows with AGE_REF >= 20 and AGE_REF <= 80
     monthly_age_ucc_spend_pipe = monthly_age_ucc_spend_pipe[
         (monthly_age_ucc_spend_pipe['AGE_REF'] >= config.AGE_THRESHOLDS['min']) & (monthly_age_ucc_spend_pipe['AGE_REF'] <= config.AGE_THRESHOLDS['max'])]
+    monthly_age_ucc_spend_pipe['AGE_REF'] = monthly_age_ucc_spend_pipe['AGE_REF'].astype(int)
     print(monthly_age_ucc_spend_pipe)
 
     # Export processed data
@@ -104,10 +96,11 @@ def process_mtbi_data_files(_years):
 
     # Reshape and export processed data
     reshaped_data = monthly_age_ucc_spend_pipe.pivot('UCC', 'AGE_REF', 'AVG_SPEND')
-    reshaped_data = pd.merge(reshaped_data, data_dict_pipe, on='UCC', how='left')
+    reshaped_data = pd.merge(reshaped_data, utils.ucc_pipe, on='UCC', how='left')
     reshaped_data.drop_duplicates(inplace=True)
-    reshaped_data.insert(1, 'UCC_DESCRIPTION', reshaped_data['UCC_DESC'])
-    reshaped_data.drop(columns='UCC_DESC', inplace=True)
+    reshaped_data.rename(columns={'UCC_DESCRIPTION': 'UCC_DESCRIPTION_COPY'}, inplace=True)
+    reshaped_data.insert(1, 'UCC_DESCRIPTION', reshaped_data['UCC_DESCRIPTION_COPY'])
+    reshaped_data.drop(columns='UCC_DESCRIPTION_COPY', inplace=True)
     reshaped_file = os.path.join(config.EXPORT_FILES_PATH, "mtbi_reshaped_avg_spend_intrvw_{}_to_{}.csv".format(start_year, end_year))
     reshaped_data.to_csv(reshaped_file, index=False)
 
@@ -120,7 +113,7 @@ def process_fmli_data_files(_years):
     for year in _years:
         year_folders.append(constants.INTERVIEW_FILES[year])
 
-    fmli_pipe = concat_data_for_type('fmli', year_folders)
+    fmli_pipe = utils.concat_data_for_type('fmli', year_folders, extract_files_path)
 
     # Generate expense variables list
     expn_vars = [x for x in list(fmli_pipe) if x.endswith('PQ') or x.endswith('CQ')]
@@ -160,41 +153,27 @@ def process_fmli_data_files(_years):
 
     # Filter rows with AGE_REF >= 20 and AGE_REF <= 80
     spend_pipe = spend_pipe[(spend_pipe['AGE_REF'] >= config.AGE_THRESHOLDS['min']) & (spend_pipe['AGE_REF'] <= config.AGE_THRESHOLDS['max'])]
+    spend_pipe['AGE_REF'] = spend_pipe['AGE_REF'].astype(int)
     print(spend_pipe)
 
     # Export processed data
     utils.make_folder(config.EXPORT_FILES_PATH)
     export_file = os.path.join(config.EXPORT_FILES_PATH, "fmli_avg_spend_intrvw_{}_to_{}.csv".format(start_year, end_year))
-    spend_pipe.to_csv(export_file, index=False)
+    # spend_pipe.to_csv(export_file, index=False)
     print("Exporting data to {}".format(export_file))
 
-
-def concat_data_for_type(_type, _year_folders):
-    year_pipes = []
-    for folder_name in _year_folders:
-        year_folder_path = os.path.join(extract_files_path, folder_name)
-
-        # Skip hidden files
-        if '.' in year_folder_path:
-            continue
-
-        quarter_pipes = []
-        # Walk the year folder path to see if the files are nested within another folder
-        for dir_path, dir_names, file_names in os.walk(year_folder_path):
-            if file_names:
-                for file_name in file_names:
-                    if file_name.endswith('.csv') and _type in file_name:
-                        file_path = os.path.join(dir_path, file_name)
-                        quarter_pipe = pd.read_csv(file_path)
-                        quarter_pipes.append(quarter_pipe)
-                        # break
-
-        # print(quarter_pipes)
-        year_pipe = pd.concat(quarter_pipes, axis=0, sort=False)
-        year_pipes.append(year_pipe)
-
-    final_pipe = pd.concat(year_pipes, axis=0, sort=False)
-    return final_pipe
+    # Reshape and export processed data
+    reshaped_data = spend_pipe.set_index('AGE_REF')
+    reshaped_data = reshaped_data.T
+    reshaped_data.reset_index(drop=False, inplace=True)
+    reshaped_data.rename(columns={'index': 'CAT_CODE'}, inplace=True)
+    reshaped_data = pd.merge(reshaped_data, utils.fmli_category_pipe, on='CAT_CODE', how='left')
+    reshaped_data.drop_duplicates(inplace=True)
+    reshaped_data.rename(columns={'CAT_DESCRIPTION': 'CAT_DESCRIPTION_COPY'}, inplace=True)
+    reshaped_data.insert(1, 'CAT_DESCRIPTION', reshaped_data['CAT_DESCRIPTION_COPY'])
+    reshaped_data.drop(columns='CAT_DESCRIPTION_COPY', inplace=True)
+    reshaped_file = os.path.join(config.EXPORT_FILES_PATH, "fmli_reshaped_avg_spend_intrvw_{}_to_{}.csv".format(start_year, end_year))
+    reshaped_data.to_csv(reshaped_file, index=False)
 
 
 if __name__ == "__main__":

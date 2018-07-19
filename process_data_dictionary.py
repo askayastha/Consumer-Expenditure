@@ -38,6 +38,9 @@ def main():
     # Replace double quotes with single quote
     final_ucc_pipe['UCC_DESCRIPTION'] = final_ucc_pipe['UCC_DESCRIPTION'].str.replace("''", "'")
 
+    # Covert column to integer type
+    final_ucc_pipe['UCC'] = final_ucc_pipe['UCC'].astype(int)
+
     # Export UCC data dictionary
     export_file = os.path.join(config.DATA_FILES_PATH,
                                "ucc_data_dictionary.csv")
