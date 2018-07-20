@@ -15,7 +15,7 @@ data_dict_pipe.dropna(inplace=True)
 
 
 def main():
-    process_interview_data_files()
+    # process_interview_data_files()
     process_fmli_data_files()
 
 
@@ -60,6 +60,7 @@ def process_interview_data_files():
                 (monthly_age_ucc_spend_pipe['WT_COST'] / monthly_age_ucc_spend_pipe['SUM_FINLWT21']) * 20).round(2)
     monthly_age_ucc_spend_pipe = monthly_age_ucc_spend_pipe[
         (monthly_age_ucc_spend_pipe['AGE_REF'] >= 20) & (monthly_age_ucc_spend_pipe['AGE_REF'] <= 80)]
+    monthly_age_ucc_spend_pipe['AGE_REF'] = monthly_age_ucc_spend_pipe['AGE_REF'].astype(int)
     print(monthly_age_ucc_spend_pipe)
 
     # Export processed data
@@ -115,6 +116,7 @@ def process_fmli_data_files():
 
     spend_pipe.drop(columns='SUM_FINLWT21', inplace=True)
     spend_pipe = spend_pipe[(spend_pipe['AGE_REF'] >= 20) & (spend_pipe['AGE_REF'] <= 80)]
+    spend_pipe['AGE_REF'] = spend_pipe['AGE_REF'].astype(int)
     print(spend_pipe)
 
     # Export processed data
@@ -122,6 +124,20 @@ def process_fmli_data_files():
     export_file = os.path.join(config.EXPORT_FILES_PATH, "test_fmli_export_file.csv")
     spend_pipe.to_csv(export_file, index=False)
     print("Exporting data to {}".format(export_file))
+
+    # Reshape and export processed data
+    reshaped_data = spend_pipe.set_index('AGE_REF')
+    reshaped_data = reshaped_data.T
+    reshaped_data.reset_index(drop=False, inplace=True)
+    reshaped_data.rename(columns={'index': 'CAT_CODE'}, inplace=True)
+    reshaped_data = pd.merge(reshaped_data, utils.fmli_category_pipe, on='CAT_CODE', how='left')
+    reshaped_data.drop_duplicates(inplace=True)
+    reshaped_data.rename(columns={'CAT_DESCRIPTION': 'CAT_DESCRIPTION_COPY'}, inplace=True)
+    reshaped_data.insert(1, 'CAT_DESCRIPTION', reshaped_data['CAT_DESCRIPTION_COPY'])
+    reshaped_data.drop(columns='CAT_DESCRIPTION_COPY', inplace=True)
+    print(reshaped_data)
+    reshaped_file = os.path.join(config.EXPORT_FILES_PATH, "test_fmli_reshaped_file.csv")
+    reshaped_data.to_csv(reshaped_file, index=False)
 
 
 def concat_data_for_type(_type):

@@ -94,7 +94,7 @@ AVG_SPEND_FILES_3_YEAR = {
     "2005-2007": "avg_spend_intrvw_2005_to_2007",
     "2008-2010": "avg_spend_intrvw_2008_to_2010",
     "2011-2013": "avg_spend_intrvw_2011_to_2013",
-    "2014-2016": "avg_spend_intrvw_2014_to_2016",
+    "2014-2016": "avg_spend_intrvw_2014_to_2016"
 }
 
 

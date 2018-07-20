@@ -25,7 +25,7 @@ def main():
 
                 if file_type == 'mtbi':
                     gof_pipe = utils.ucc_pipe.copy()
-                    gof_pipe['GOODNESS_OF_FIT'] = -1
+                    gof_pipe['GOODNESS_OF_FIT'] = np.nan
 
                     for category_value in utils.ucc_dict.keys():
                         filtered_pipe = avg_spend_pipe[avg_spend_pipe['UCC'] == int(category_value)]
@@ -44,7 +44,7 @@ def main():
 
                 elif file_type == 'fmli':
                     gof_pipe = utils.fmli_category_pipe.copy()
-                    gof_pipe['GOODNESS_OF_FIT'] = -1
+                    gof_pipe['GOODNESS_OF_FIT'] = np.nan
 
                     for category_value in utils.fmli_dict.keys():
                         filtered_pipe = avg_spend_pipe[['AGE_REF', category_value]]
@@ -70,7 +70,7 @@ def main():
 
 def export_goodness_of_fit_files(file_type, gof_pipe, part_file_name):
     utils.make_folder(config.GOODNESS_OF_FIT_FOLDER_PATH)
-    gof_file_name = "{}_{}_{}.csv".format(file_type, 'gof', part_file_name)
+    gof_file_name = "{}_gof_{}.csv".format(file_type, part_file_name)
     gof_file = os.path.join(config.GOODNESS_OF_FIT_FOLDER_PATH, gof_file_name)
     gof_pipe.to_csv(gof_file, index=False)
     print("Exporting data to {}".format(gof_file))
@@ -78,7 +78,7 @@ def export_goodness_of_fit_files(file_type, gof_pipe, part_file_name):
 
 def export_pickle_files(file_type, part_file_name, spline_dict):
     utils.make_folder(config.SPLINES_FOLDER_PATH)
-    spline_file_name = "{}_{}_{}.pkl".format(file_type, 'spline', part_file_name)
+    spline_file_name = "{}_spline_{}.pkl".format(file_type, part_file_name)
     spline_file = os.path.join(config.SPLINES_FOLDER_PATH, spline_file_name)
 
     with open(spline_file, 'wb') as file:
@@ -89,7 +89,7 @@ def export_pickle_files(file_type, part_file_name, spline_dict):
 
 def calculate_goodness_of_fit(data_pipe, spline, file_type, category_value):
     if spline is None:
-        return -1
+        return np.nan
 
     if file_type == 'mtbi':
         data_dict = pd.Series(data_pipe['AVG_SPEND'].values, index=data_pipe['AGE_REF']).to_dict()
@@ -108,7 +108,7 @@ def calculate_goodness_of_fit(data_pipe, spline, file_type, category_value):
     try:
         gof_value = mean_squared_error(y_true, y_pred)
     except ValueError:
-        return -1
+        return np.nan
 
     return gof_value
 
