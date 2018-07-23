@@ -116,7 +116,7 @@ def update_dropdown_category_options(file_type, bucket_size, sort_value, year_sl
     elif sort_value == 'gof':
         slider_label = list(utils.avg_spend_files_for_bucket(bucket_size).keys())[int(year_slider_value)]
         part_file_name = utils.avg_spend_files_for_bucket(bucket_size)[slider_label]
-        file_name = "{}_{}_{}.csv".format(file_type, 'gof', part_file_name)
+        file_name = "{}_gof_{}.csv".format(file_type, part_file_name)
         file = os.path.join(config.GOODNESS_OF_FIT_FOLDER_PATH, file_name)
 
         gof_pipe = pd.read_csv(file)
