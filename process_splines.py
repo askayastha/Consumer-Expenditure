@@ -3,11 +3,13 @@ import pandas as pd
 from scipy.interpolate import UnivariateSpline
 from scipy.signal.windows import gaussian
 from scipy.ndimage import filters
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_absolute_error
 import config
+import constants
 import os
 import pickle
 import utils
-from sklearn.metrics import mean_squared_error
 
 
 def main():
@@ -25,7 +27,8 @@ def main():
 
                 if file_type == 'mtbi':
                     gof_pipe = utils.ucc_pipe.copy()
-                    gof_pipe['GOODNESS_OF_FIT'] = np.nan
+                    gof_pipe['MSE_BY_MEAN'] = np.nan
+                    gof_pipe['MAE_BY_MEAN'] = np.nan
 
                     for category_value in utils.ucc_dict.keys():
                         filtered_pipe = avg_spend_pipe[avg_spend_pipe['UCC'] == int(category_value)]
@@ -35,8 +38,10 @@ def main():
                         spline_dict[category_value] = spline
 
                         # Goodness of Fit
-                        gof_value = calculate_goodness_of_fit(filtered_pipe, spline, file_type, category_value)
-                        gof_pipe.loc[gof_pipe['UCC'] == category_value, 'GOODNESS_OF_FIT'] = gof_value
+                        mse_by_mean_value = calculate_goodness_of_fit(filtered_pipe, spline, file_type, category_value, constants.MEAN_SQUARED_ERROR_BY_MEAN)
+                        mae_by_mean_value = calculate_goodness_of_fit(filtered_pipe, spline, file_type, category_value, constants.MEAN_ABSOLUTE_ERROR_BY_MEAN)
+                        gof_pipe.loc[gof_pipe['UCC'] == category_value, 'MSE_BY_MEAN'] = mse_by_mean_value
+                        gof_pipe.loc[gof_pipe['UCC'] == category_value, 'MAE_BY_MEAN'] = mae_by_mean_value
 
                         # Goodness of Data
                         god_value = utils.check_goodness_of_data(filtered_pipe)
@@ -44,7 +49,8 @@ def main():
 
                 elif file_type == 'fmli':
                     gof_pipe = utils.fmli_category_pipe.copy()
-                    gof_pipe['GOODNESS_OF_FIT'] = np.nan
+                    gof_pipe['MSE_BY_MEAN'] = np.nan
+                    gof_pipe['MAE_BY_MEAN'] = np.nan
 
                     for category_value in utils.fmli_dict.keys():
                         filtered_pipe = avg_spend_pipe[['AGE_REF', category_value]]
@@ -54,15 +60,17 @@ def main():
                         spline_dict[category_value] = spline
 
                         # Goodness of Fit
-                        gof_value = calculate_goodness_of_fit(filtered_pipe, spline, file_type, category_value)
-                        gof_pipe.loc[gof_pipe['CAT_CODE'] == category_value, 'GOODNESS_OF_FIT'] = gof_value
+                        mse_by_mean_value = calculate_goodness_of_fit(filtered_pipe, spline, file_type, category_value, constants.MEAN_SQUARED_ERROR_BY_MEAN)
+                        mae_by_mean_value = calculate_goodness_of_fit(filtered_pipe, spline, file_type, category_value, constants.MEAN_ABSOLUTE_ERROR_BY_MEAN)
+                        gof_pipe.loc[gof_pipe['CAT_CODE'] == category_value, 'MSE_BY_MEAN'] = mse_by_mean_value
+                        gof_pipe.loc[gof_pipe['CAT_CODE'] == category_value, 'MAE_BY_MEAN'] = mae_by_mean_value
 
                         # Goodness of Data
                         god_value = utils.check_goodness_of_data(filtered_pipe)
                         gof_pipe.loc[gof_pipe['CAT_CODE'] == category_value, 'GOODNESS_OF_DATA'] = god_value
 
                 # Export pickle files
-                export_pickle_files(file_type, part_file_name, spline_dict)
+                # export_pickle_files(file_type, part_file_name, spline_dict)
 
                 # Export goodness of fit files
                 export_goodness_of_fit_files(file_type, gof_pipe, part_file_name)
@@ -87,7 +95,7 @@ def export_pickle_files(file_type, part_file_name, spline_dict):
     print("Exporting data to {}".format(spline_file))
 
 
-def calculate_goodness_of_fit(data_pipe, spline, file_type, category_value):
+def calculate_goodness_of_fit(data_pipe, spline, file_type, category_value, error_type):
     if spline is None:
         return np.nan
 
@@ -106,11 +114,15 @@ def calculate_goodness_of_fit(data_pipe, spline, file_type, category_value):
     # expected_vals = data_pipe['AVG_SPEND'].tolist() if file_type == 'mtbi' else data_pipe[category_value].tolist()
 
     try:
-        gof_value = mean_squared_error(y_true, y_pred)
+        if error_type == constants.MEAN_SQUARED_ERROR_BY_MEAN:
+            gof_value = mean_squared_error(y_true, y_pred) / np.mean(y_true)
+        elif error_type == constants.MEAN_ABSOLUTE_ERROR_BY_MEAN:
+            gof_value = mean_absolute_error(y_true, y_pred) / np.mean(y_true)
+    
     except ValueError:
         return np.nan
 
-    return gof_value
+    return abs(gof_value)
 
 
 def calculate_spline(data_pipe, file_type, category_value):

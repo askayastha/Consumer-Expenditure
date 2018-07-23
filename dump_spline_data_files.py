@@ -49,24 +49,24 @@ def main():
                     god_list = gof_pipe[gof_pipe['GOODNESS_OF_DATA']]['UCC'].tolist()
                     data_pipe = data_pipe[data_pipe['UCC'].isin(god_list)]
 
-                    gof_pipe = gof_pipe[['UCC', 'GOODNESS_OF_FIT']]
-                    gof_pipe.rename(columns={'GOODNESS_OF_FIT': 'GOODNESS_OF_FIT_COPY'}, inplace=True)
+                    gof_pipe = gof_pipe[['UCC', 'MAE_BY_MEAN']]
+                    gof_pipe.rename(columns={'MAE_BY_MEAN': 'MAE_BY_MEAN_COPY'}, inplace=True)
                     data_pipe = pd.merge(data_pipe, gof_pipe, on='UCC', how='left')
                     data_pipe.drop_duplicates(inplace=True)
-                    data_pipe.insert(3, 'GOODNESS_OF_FIT', data_pipe['GOODNESS_OF_FIT_COPY'])
-                    data_pipe.drop(columns='GOODNESS_OF_FIT_COPY', inplace=True)
+                    data_pipe.insert(3, 'MAE_BY_MEAN', data_pipe['MAE_BY_MEAN_COPY'])
+                    data_pipe.drop(columns='MAE_BY_MEAN_COPY', inplace=True)
                     mtbi_agg_data_pipes.append(data_pipe)
 
                 elif file_type == 'fmli':
                     god_list = gof_pipe[gof_pipe['GOODNESS_OF_DATA']]['CAT_CODE'].tolist()
                     data_pipe = data_pipe[data_pipe['CAT_CODE'].isin(god_list)]
 
-                    gof_pipe = gof_pipe[['CAT_CODE', 'GOODNESS_OF_FIT']]
-                    gof_pipe.rename(columns={'GOODNESS_OF_FIT': 'GOODNESS_OF_FIT_COPY'}, inplace=True)
+                    gof_pipe = gof_pipe[['CAT_CODE', 'MAE_BY_MEAN']]
+                    gof_pipe.rename(columns={'MAE_BY_MEAN': 'MAE_BY_MEAN_COPY'}, inplace=True)
                     data_pipe = pd.merge(data_pipe, gof_pipe, on='CAT_CODE', how='left')
                     data_pipe.drop_duplicates(inplace=True)
-                    data_pipe.insert(3, 'GOODNESS_OF_FIT', data_pipe['GOODNESS_OF_FIT_COPY'])
-                    data_pipe.drop(columns='GOODNESS_OF_FIT_COPY', inplace=True)
+                    data_pipe.insert(3, 'MAE_BY_MEAN', data_pipe['MAE_BY_MEAN_COPY'])
+                    data_pipe.drop(columns='MAE_BY_MEAN_COPY', inplace=True)
                     fmli_agg_data_pipes.append(data_pipe)
 
         mtbi_agg_data_pipe = pd.concat(mtbi_agg_data_pipes, axis=0, sort=False)
@@ -74,10 +74,6 @@ def main():
 
         mtbi_agg_data_pipe.sort_values(by=['UCC_DESCRIPTION', 'YEAR_BUCKET'], inplace=True)
         fmli_agg_data_pipe.sort_values(by=['CAT_DESCRIPTION', 'YEAR_BUCKET'], inplace=True)
-
-        # Filter categories
-        # mtbi_agg_data_pipe = filter_categories_for_data(mtbi_agg_data_pipe, bucket_size, 'mtbi')
-        # fmli_agg_data_pipe = filter_categories_for_data(fmli_agg_data_pipe, bucket_size, 'fmli')
 
         # Export aggregate files
         export_aggregate_file(mtbi_agg_data_pipe, bucket_size, 'mtbi')
@@ -108,21 +104,6 @@ def good_data_categories(bucket_size, file_type):
 
     elif file_type == 'fmli':
         return god_pipe[['CAT_CODE', 'CAT_DESCRIPTION']]
-
-
-def filter_categories_for_data(agg_data_pipe, file_type, part_file_name):
-    gof_file_name = "{}_gof_{}.csv".format(file_type, part_file_name)
-    gof_file = os.path.join(config.GOODNESS_OF_FIT_FOLDER_PATH, gof_file_name)
-    gof_pipe = pd.read_csv(gof_file)
-
-    if file_type == 'mtbi':
-        god_list = gof_pipe[gof_pipe['GOODNESS_OF_DATA']]['UCC'].tolist()
-        agg_data_pipe = agg_data_pipe[agg_data_pipe['UCC'].isin(god_list)]
-    elif file_type == 'fmli':
-        god_list = gof_pipe[gof_pipe['GOODNESS_OF_DATA']]['CAT_CODE'].tolist()
-        agg_data_pipe = agg_data_pipe[agg_data_pipe['CAT_CODE'].isin(god_list)]
-
-    return agg_data_pipe
 
 
 def export_aggregate_file(agg_data_pipe, bucket_size, file_type):
