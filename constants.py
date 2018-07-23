@@ -5,7 +5,8 @@
 PUMD_DATA_FILE_TYPES = ['interview', 'diary']
 EXTRACT_INTERVIEW_FILE_TYPES = ['fmli', 'mtbi']
 EXTRACT_DIARY_FILE_TYPES = ['fmld', 'expd']
-
+MEAN_SQUARED_ERROR_BY_MEAN = "mean_squared_error_by_mean"
+MEAN_ABSOLUTE_ERROR_BY_MEAN = "mean_absolute_error_by_mean"
 
 INTERVIEW_FILES = {
     1996: "intrvw96",

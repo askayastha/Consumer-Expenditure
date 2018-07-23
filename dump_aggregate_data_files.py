@@ -24,21 +24,21 @@ def main():
                 data_pipe.drop(columns='YEAR_BUCKET_COPY', inplace=True)
 
                 if file_type == 'mtbi':
-                    gof_pipe = gof_pipe[['UCC', 'GOODNESS_OF_FIT']]
-                    gof_pipe.rename(columns={'GOODNESS_OF_FIT': 'GOODNESS_OF_FIT_COPY'}, inplace=True)
+                    gof_pipe = gof_pipe[['UCC', 'MAE_BY_MEAN']]
+                    gof_pipe.rename(columns={'MAE_BY_MEAN': 'MAE_BY_MEAN_COPY'}, inplace=True)
                     data_pipe = pd.merge(data_pipe, gof_pipe, on='UCC', how='left')
                     data_pipe.drop_duplicates(inplace=True)
-                    data_pipe.insert(3, 'GOODNESS_OF_FIT', data_pipe['GOODNESS_OF_FIT_COPY'])
-                    data_pipe.drop(columns='GOODNESS_OF_FIT_COPY', inplace=True)
+                    data_pipe.insert(3, 'MAE_BY_MEAN', data_pipe['MAE_BY_MEAN_COPY'])
+                    data_pipe.drop(columns='MAE_BY_MEAN_COPY', inplace=True)
                     mtbi_agg_data_pipes.append(data_pipe)
 
                 elif file_type == 'fmli':
-                    gof_pipe = gof_pipe[['CAT_CODE', 'GOODNESS_OF_FIT']]
-                    gof_pipe.rename(columns={'GOODNESS_OF_FIT': 'GOODNESS_OF_FIT_COPY'}, inplace=True)
+                    gof_pipe = gof_pipe[['CAT_CODE', 'MAE_BY_MEAN']]
+                    gof_pipe.rename(columns={'MAE_BY_MEAN': 'MAE_BY_MEAN_COPY'}, inplace=True)
                     data_pipe = pd.merge(data_pipe, gof_pipe, on='CAT_CODE', how='left')
                     data_pipe.drop_duplicates(inplace=True)
-                    data_pipe.insert(3, 'GOODNESS_OF_FIT', data_pipe['GOODNESS_OF_FIT_COPY'])
-                    data_pipe.drop(columns='GOODNESS_OF_FIT_COPY', inplace=True)
+                    data_pipe.insert(3, 'MAE_BY_MEAN', data_pipe['MAE_BY_MEAN_COPY'])
+                    data_pipe.drop(columns='MAE_BY_MEAN_COPY', inplace=True)
                     fmli_agg_data_pipes.append(data_pipe)
 
         mtbi_agg_data_pipe = pd.concat(mtbi_agg_data_pipes, axis=0, sort=False)

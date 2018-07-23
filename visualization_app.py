@@ -130,9 +130,9 @@ def update_dropdown_category_options(file_type, bucket_size, sort_value, year_sl
         gof_pipe = gof_pipe[gof_pipe['GOODNESS_OF_DATA']]
 
         if file_type == 'mtbi':
-            gof_dict = pd.Series(gof_pipe['GOODNESS_OF_FIT'].values, index=gof_pipe['UCC']).to_dict()
+            gof_dict = pd.Series(gof_pipe['MAE_BY_MEAN'].values, index=gof_pipe['UCC']).to_dict()
         elif file_type == 'fmli':
-            gof_dict = pd.Series(gof_pipe['GOODNESS_OF_FIT'].values, index=gof_pipe['CAT_CODE']).to_dict()
+            gof_dict = pd.Series(gof_pipe['MAE_BY_MEAN'].values, index=gof_pipe['CAT_CODE']).to_dict()
 
         sorted_gof_dict = collections.OrderedDict(sorted(gof_dict.items(), key=lambda t: t[1]))
         sorted_category_dict = collections.OrderedDict()
