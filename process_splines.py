@@ -115,14 +115,14 @@ def calculate_goodness_of_fit(data_pipe, spline, file_type, category_value, erro
 
     try:
         if error_type == constants.MEAN_SQUARED_ERROR_BY_MEAN:
-            gof_value = mean_squared_error(y_true, y_pred) / np.mean(y_true)
+            gof_value = mean_squared_error(y_true, y_pred) / abs(np.mean(y_true))
         elif error_type == constants.MEAN_ABSOLUTE_ERROR_BY_MEAN:
-            gof_value = mean_absolute_error(y_true, y_pred) / np.mean(y_true)
+            gof_value = mean_absolute_error(y_true, y_pred) / abs(np.mean(y_true))
     
     except ValueError:
         return np.nan
 
-    return abs(gof_value)
+    return gof_value
 
 
 def calculate_spline(data_pipe, file_type, category_value):
