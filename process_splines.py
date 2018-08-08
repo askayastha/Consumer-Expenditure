@@ -14,7 +14,7 @@ import utils
 
 def main():
     for bucket_size in ['3', '5']:
-        folder_path = os.path.join(config.DATA_FILES_PATH, "processed_data_{}yrs_bucket_aug08".format(int(bucket_size)))
+        folder_path = os.path.join(config.DATA_FILES_PATH, config.PROCESSED_DATA_FOLDER.format(int(bucket_size)))
 
         for file_type in ['mtbi', 'fmli']:
             for part_file_name in utils.avg_spend_files_for_bucket(bucket_size).values():
