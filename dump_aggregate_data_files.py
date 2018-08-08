@@ -12,7 +12,7 @@ def main():
         for file_type in ['mtbi', 'fmli']:
             for bucket_name, part_file_name in utils.avg_spend_files_for_bucket(bucket_size).items():
                 reshaped_file_name = "{}_reshaped_{}.csv".format(file_type, part_file_name)
-                reshaped_file = os.path.join(config.DATA_FILES_PATH, "processed_data_{}yrs_bucket_jul18".format(int(bucket_size)), reshaped_file_name)
+                reshaped_file = os.path.join(config.DATA_FILES_PATH, config.PROCESSED_DATA_FOLDER.format(int(bucket_size)), reshaped_file_name)
 
                 gof_file_name = "{}_gof_{}.csv".format(file_type, part_file_name)
                 gof_file = os.path.join(config.GOODNESS_OF_FIT_FOLDER_PATH, gof_file_name)

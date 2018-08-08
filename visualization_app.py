@@ -201,7 +201,7 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
     part_file_name = utils.avg_spend_files_for_bucket(bucket_size)[slider_label]
     file_name = "{}_{}.csv".format(file_type, part_file_name)
     print(file_name)
-    file = os.path.join(config.DATA_FILES_PATH, "processed_data_{}yrs_bucket_aug08".format(int(bucket_size)), file_name)
+    file = os.path.join(config.DATA_FILES_PATH, config.PROCESSED_DATA_FOLDER.format(int(bucket_size)), file_name)
     avg_spend_pipe = pd.read_csv(file)
 
     if file_type == 'mtbi':

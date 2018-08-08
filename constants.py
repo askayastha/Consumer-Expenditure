@@ -64,15 +64,20 @@ PROCESS_INTERVIEW_SCRIPT = "process_interview_data_files.py"
 PROCESS_DIARY_SCRIPT = "process_diary_data_files.py"
 PROCESS_DATA_DICTIONARY = "process_data_dictionary.py"
 PROCESS_SPLINES = "process_splines.py"
+PROCESS_GOODNESS_OF_DATA = "process_goodness_of_data.py"
+DUMP_AGGREGATE_DATA_FILES = "dump_aggregate_data_files.py"
+DUMP_SPLINE_DATA_FILES = "dump_spline_data_files.py"
 
 
 JOBS = {
     1: "python3 {}".format(DOWNLOAD_SCRIPT),
     2: "python3 {}".format(EXTRACT_SCRIPT),
     3: "python3 {}".format(PROCESS_INTERVIEW_SCRIPT),
-    4: "python3 {}".format(PROCESS_DIARY_SCRIPT),
-    5: "python3 {}".format(PROCESS_DATA_DICTIONARY),
-    6: "python3 {}".format(PROCESS_SPLINES)
+    4: "python3 {}".format(PROCESS_DATA_DICTIONARY),
+    5: "python3 {}".format(PROCESS_SPLINES),
+    6: "python3 {}".format(PROCESS_GOODNESS_OF_DATA),
+    7: "python3 {}".format(DUMP_AGGREGATE_DATA_FILES),
+    8: "python3 {}".format(DUMP_SPLINE_DATA_FILES)
 }
 
 
@@ -80,10 +85,12 @@ JOBS_DESC = {
     1: "Download CE data files",
     2: "Extract CE data files",
     3: "Process CE Interview data",
-    4: "Process CE Diary data",
-    5: "Process CE data dictionary",
-    6: "Process CE splines",
-    7: "Quit"
+    4: "Process CE data dictionary",
+    5: "Process CE splines",
+    6: "Process CE goodness of data",
+    7: "Dump aggregate data files",
+    8: "Dump spline data files",
+    9: "Quit"
 }
 
 
