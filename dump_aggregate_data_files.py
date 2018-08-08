@@ -24,20 +24,26 @@ def main():
                 data_pipe.drop(columns='YEAR_BUCKET_COPY', inplace=True)
 
                 if file_type == 'mtbi':
-                    gof_pipe = gof_pipe[['UCC', 'MAE_BY_MEAN']]
+                    gof_pipe = gof_pipe[['UCC', 'MSE_BY_MEAN', 'MAE_BY_MEAN']]
+                    gof_pipe.rename(columns={'MSE_BY_MEAN': 'MSE_BY_MEAN_COPY'}, inplace=True)
                     gof_pipe.rename(columns={'MAE_BY_MEAN': 'MAE_BY_MEAN_COPY'}, inplace=True)
                     data_pipe = pd.merge(data_pipe, gof_pipe, on='UCC', how='left')
                     data_pipe.drop_duplicates(inplace=True)
-                    data_pipe.insert(3, 'MAE_BY_MEAN', data_pipe['MAE_BY_MEAN_COPY'])
+                    data_pipe.insert(3, 'MSE_BY_MEAN', data_pipe['MSE_BY_MEAN_COPY'])
+                    data_pipe.insert(4, 'MAE_BY_MEAN', data_pipe['MAE_BY_MEAN_COPY'])
+                    data_pipe.drop(columns='MSE_BY_MEAN_COPY', inplace=True)
                     data_pipe.drop(columns='MAE_BY_MEAN_COPY', inplace=True)
                     mtbi_agg_data_pipes.append(data_pipe)
 
                 elif file_type == 'fmli':
-                    gof_pipe = gof_pipe[['CAT_CODE', 'MAE_BY_MEAN']]
+                    gof_pipe = gof_pipe[['CAT_CODE', 'MSE_BY_MEAN', 'MAE_BY_MEAN']]
+                    gof_pipe.rename(columns={'MSE_BY_MEAN': 'MSE_BY_MEAN_COPY'}, inplace=True)
                     gof_pipe.rename(columns={'MAE_BY_MEAN': 'MAE_BY_MEAN_COPY'}, inplace=True)
                     data_pipe = pd.merge(data_pipe, gof_pipe, on='CAT_CODE', how='left')
                     data_pipe.drop_duplicates(inplace=True)
-                    data_pipe.insert(3, 'MAE_BY_MEAN', data_pipe['MAE_BY_MEAN_COPY'])
+                    data_pipe.insert(3, 'MSE_BY_MEAN', data_pipe['MSE_BY_MEAN_COPY'])
+                    data_pipe.insert(4, 'MAE_BY_MEAN', data_pipe['MAE_BY_MEAN_COPY'])
+                    data_pipe.drop(columns='MSE_BY_MEAN_COPY', inplace=True)
                     data_pipe.drop(columns='MAE_BY_MEAN_COPY', inplace=True)
                     fmli_agg_data_pipes.append(data_pipe)
 

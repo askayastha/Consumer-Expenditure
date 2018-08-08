@@ -14,7 +14,7 @@ import utils
 
 def main():
     for bucket_size in ['3', '5']:
-        folder_path = os.path.join(config.DATA_FILES_PATH, "processed_data_{}yrs_bucket_jun26".format(int(bucket_size)))
+        folder_path = os.path.join(config.DATA_FILES_PATH, "processed_data_{}yrs_bucket_aug08".format(int(bucket_size)))
 
         for file_type in ['mtbi', 'fmli']:
             for part_file_name in utils.avg_spend_files_for_bucket(bucket_size).values():
@@ -70,7 +70,7 @@ def main():
                         gof_pipe.loc[gof_pipe['CAT_CODE'] == category_value, 'GOODNESS_OF_DATA'] = god_value
 
                 # Export pickle files
-                # export_pickle_files(file_type, part_file_name, spline_dict)
+                export_pickle_files(file_type, part_file_name, spline_dict)
 
                 # Export goodness of fit files
                 export_goodness_of_fit_files(file_type, gof_pipe, part_file_name)
@@ -115,14 +115,14 @@ def calculate_goodness_of_fit(data_pipe, spline, file_type, category_value, erro
 
     try:
         if error_type == constants.MEAN_SQUARED_ERROR_BY_MEAN:
-            gof_value = mean_squared_error(y_true, y_pred) / np.mean(y_true)
+            gof_value = mean_squared_error(y_true, y_pred) / abs(np.mean(y_true))
         elif error_type == constants.MEAN_ABSOLUTE_ERROR_BY_MEAN:
-            gof_value = mean_absolute_error(y_true, y_pred) / np.mean(y_true)
+            gof_value = mean_absolute_error(y_true, y_pred) / abs(np.mean(y_true))
     
     except ValueError:
         return np.nan
 
-    return abs(gof_value)
+    return gof_value
 
 
 def calculate_spline(data_pipe, file_type, category_value):

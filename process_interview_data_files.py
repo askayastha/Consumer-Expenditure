@@ -28,7 +28,7 @@ def main():
         for i in range(config.YEAR_BUCKET_SIZE):
             years_bucket.append(year + i)
         # print(years_bucket)
-        # process_mtbi_data_files(years_bucket)
+        process_mtbi_data_files(years_bucket)
         process_fmli_data_files(years_bucket)
 
     end_time = datetime.now()
@@ -78,7 +78,7 @@ def process_mtbi_data_files(_years):
     monthly_age_ucc_spend_pipe.drop_duplicates(inplace=True)
 
     # Calcuate the average spend by dividing Sum(FINLWT21 * COST) by the denominator Sum(FINLWT21) grouped by AGE_REF
-    monthly_age_ucc_spend_pipe['AVG_SPEND'] = ((monthly_age_ucc_spend_pipe['WT_COST'] / monthly_age_ucc_spend_pipe['SUM_FINLWT21']) * YEAR_BUCKET_SIZE_MULTIPLIER).round(2)
+    monthly_age_ucc_spend_pipe['AVG_SPEND'] = (((monthly_age_ucc_spend_pipe['WT_COST'] / monthly_age_ucc_spend_pipe['SUM_FINLWT21']) * YEAR_BUCKET_SIZE_MULTIPLIER) / config.YEAR_BUCKET_SIZE).round(2)
 
     monthly_age_ucc_spend_pipe.drop(columns='SUM_FINLWT21', inplace=True)
 
@@ -146,7 +146,7 @@ def process_fmli_data_files(_years):
 
     # Calculate the average spend by dividing weighted spend by the denominator Sum(FINLWT21) grouped by AGE_REF
     for key, val in expn_vars_dict.items():
-        spend_pipe[key] = ((spend_pipe['WT_' + key] / spend_pipe['SUM_FINLWT21']) * YEAR_BUCKET_SIZE_MULTIPLIER).round(2)
+        spend_pipe[key] = (((spend_pipe['WT_' + key] / spend_pipe['SUM_FINLWT21']) * YEAR_BUCKET_SIZE_MULTIPLIER) / config.YEAR_BUCKET_SIZE).round(2)
         spend_pipe.drop(columns='WT_' + key, inplace=True)
 
     spend_pipe.drop(columns='SUM_FINLWT21', inplace=True)
@@ -159,7 +159,7 @@ def process_fmli_data_files(_years):
     # Export processed data
     utils.make_folder(config.EXPORT_FILES_PATH)
     export_file = os.path.join(config.EXPORT_FILES_PATH, "fmli_avg_spend_intrvw_{}_to_{}.csv".format(start_year, end_year))
-    # spend_pipe.to_csv(export_file, index=False)
+    spend_pipe.to_csv(export_file, index=False)
     print("Exporting data to {}".format(export_file))
 
     # Reshape and export processed data
