@@ -249,7 +249,7 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
                     x=xs,
                     y=u_spline(xs),
                     mode="lines",
-                    opacity=1.0,
+                    opacity=0.8,
                     line={'shape': 'spline'}
                 )
             ],
@@ -276,7 +276,7 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
                         x=xs,
                         y=spline_dict[category_value](xs),
                         mode="lines",
-                        opacity=1.0,
+                        opacity=0.8,
                         line={'shape': 'spline'}
                     )
                 )
