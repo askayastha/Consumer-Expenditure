@@ -83,7 +83,12 @@ app.layout = html.Div([
         ], style={'width': '33%', 'float': 'right', 'display': 'inline-block'}),
         html.Br(),
         html.Br(),
-        dcc.Graph(id='age-vs-spend'),
+        dcc.Graph(
+            id='age-vs-spend',
+            config={
+                'displayModeBar': False
+            }
+        ),
         html.Div([
             dcc.Slider(
                 id='year-slider',
