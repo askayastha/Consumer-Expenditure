@@ -115,19 +115,7 @@ def process_fmli_data_files(_years):
 
     fmli_pipe = utils.concat_data_for_type('fmli', year_folders, extract_files_path)
 
-    # Generate expense variables list
-    expn_vars = [x for x in list(fmli_pipe) if x.endswith('PQ') or x.endswith('CQ')]
-    expn_vars_dict = {}
-
-    # Organize expense variables in dictionary for data processing
-    for expn_var in expn_vars:
-        expn_vars_dict[expn_var[0:-2]] = []
-
-    for expn_var in expn_vars:
-        expn_vars_dict.get(expn_var[0:-2]).append(expn_var)
-
-    # Filter out non expense variables using the fact that individual expense would be reported in pairs (PQ, CQ)
-    expn_vars_dict = {key: val for key, val in expn_vars_dict.items() if len(val) == 2}
+    expn_vars_dict = get_expense_vars_dict(fmli_pipe)
 
     # Sum(FINLWT21) grouped by AGE_REF in 'fmli' files
     finl_wt_pipe = fmli_pipe.groupby(['AGE_REF'], as_index=False)['FINLWT21'].sum()
@@ -174,6 +162,41 @@ def process_fmli_data_files(_years):
     reshaped_data.drop(columns='CAT_DESCRIPTION_COPY', inplace=True)
     reshaped_file = os.path.join(config.EXPORT_FILES_PATH, "fmli_reshaped_avg_spend_intrvw_{}_to_{}.csv".format(start_year, end_year))
     reshaped_data.to_csv(reshaped_file, index=False)
+
+
+def get_expense_vars_dict(fmli_pipe):
+    # Generate expense variables list
+    expn_vars_1 = [x for x in list(fmli_pipe) if x.endswith('PQ') or x.endswith('CQ')]
+    expn_vars_2 = [x for x in list(fmli_pipe) if x.endswith('P') or x.endswith('C')]
+    expn_vars_3 = [x for x in list(fmli_pipe) if x.endswith('PX4') or x.endswith('CX4')]
+    expn_vars_dict = {}
+
+    # Organize expense variables in dictionary for data processing
+    for expn_var in expn_vars_1:
+        expn_vars_dict[expn_var[0:-2]] = []
+
+    for expn_var in expn_vars_1:
+        expn_vars_dict.get(expn_var[0:-2]).append(expn_var)
+
+    # Organize expense variables in dictionary for data processing
+    for expn_var in expn_vars_2:
+        expn_vars_dict[expn_var[0:-1]] = []
+
+    for expn_var in expn_vars_2:
+        expn_vars_dict.get(expn_var[0:-1]).append(expn_var)
+
+    # Organize expense variables in dictionary for data processing
+    for expn_var in expn_vars_3:
+        replace_letter = expn_var[-3]
+        expn_vars_dict[expn_var.replace(replace_letter, '')] = []
+
+    for expn_var in expn_vars_3:
+        replace_letter = expn_var[-3]
+        expn_vars_dict.get(expn_var.replace(replace_letter, '')).append(expn_var)
+
+    # Filter out non expense variables using the fact that individual expense would be reported in pairs (PQ, CQ)
+    expn_vars_dict = {key: val for key, val in expn_vars_dict.items() if len(val) == 2}
+    return expn_vars_dict
 
 
 if __name__ == "__main__":

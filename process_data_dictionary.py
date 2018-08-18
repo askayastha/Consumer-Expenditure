@@ -42,8 +42,7 @@ def main():
     final_ucc_pipe['UCC'] = final_ucc_pipe['UCC'].astype(int)
 
     # Export UCC data dictionary
-    export_file = os.path.join(config.DATA_FILES_PATH,
-                               "ucc_data_dictionary.csv")
+    export_file = os.path.join(config.DATA_FILES_PATH, "ucc_data_dictionary.csv")
     final_ucc_pipe.to_csv(export_file, index=False)
     print("Exporting data to {}".format(export_file))
 
@@ -63,6 +62,7 @@ def concat_data_for_type(_type, _year_folders):
     year_pipes = []
     for folder_name in _year_folders:
         year_folder_path = os.path.join(extract_files_path, folder_name)
+        short_year = folder_name[-2:]
 
         # Skip hidden files
         if '.' in year_folder_path:
@@ -73,7 +73,7 @@ def concat_data_for_type(_type, _year_folders):
         for dir_path, dir_names, file_names in os.walk(year_folder_path):
             if file_names:
                 for file_name in file_names:
-                    if file_name.endswith('.csv') and _type in file_name:
+                    if file_name.endswith('.csv') and _type in file_name and short_year in file_name and '._' not in file_name:
                         file_path = os.path.join(dir_path, file_name)
                         quarter_pipe = pd.read_csv(file_path)
                         quarter_pipes.append(quarter_pipe)

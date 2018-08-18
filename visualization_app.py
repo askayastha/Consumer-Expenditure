@@ -212,10 +212,16 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
     if file_type == 'mtbi':
         filtered_pipe = avg_spend_pipe[avg_spend_pipe['UCC'] == int(category_value)]
     elif file_type == 'fmli':
-        filtered_pipe = avg_spend_pipe[['AGE_REF', category_value]]
+        try:
+            filtered_pipe = avg_spend_pipe[['AGE_REF', category_value]]
+        except KeyError:
+            filtered_pipe = pd.DataFrame()
 
     spline_dict = utils.spline_dict_for_file(file_type, part_file_name)
-    u_spline = spline_dict[category_value]
+    try:
+        u_spline = spline_dict[category_value]
+    except KeyError:
+        u_spline = None
 
     if graph_type == 'individual-bucket' and (filtered_pipe.empty or u_spline is None):
         print("***** NO DATA *****")
@@ -269,17 +275,20 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
         for spline_label, part_file_name in utils.avg_spend_files_for_bucket(bucket_size).items():
             spline_dict = utils.spline_dict_for_file(file_type, part_file_name)
 
-            if spline_dict[category_value] is not None:
-                traces.append(
-                    go.Scatter(
-                        name=spline_label,
-                        x=xs,
-                        y=spline_dict[category_value](xs),
-                        mode="lines",
-                        opacity=0.8,
-                        line={'shape': 'spline'}
+            try:
+                if spline_dict[category_value] is not None:
+                    traces.append(
+                        go.Scatter(
+                            name=spline_label,
+                            x=xs,
+                            y=spline_dict[category_value](xs),
+                            mode="lines",
+                            opacity=0.8,
+                            line={'shape': 'spline'}
+                        )
                     )
-                )
+            except KeyError:
+                continue
 
         layout = go.Layout(
             title=utils.category_dict_for_file(file_type)[category_value],

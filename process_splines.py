@@ -53,7 +53,10 @@ def main():
                     gof_pipe['MAE_BY_MEAN'] = np.nan
 
                     for category_value in utils.fmli_dict.keys():
-                        filtered_pipe = avg_spend_pipe[['AGE_REF', category_value]]
+                        try:
+                            filtered_pipe = avg_spend_pipe[['AGE_REF', category_value]]
+                        except KeyError:
+                            continue
 
                         # Spline
                         spline = calculate_spline(filtered_pipe, file_type, category_value)

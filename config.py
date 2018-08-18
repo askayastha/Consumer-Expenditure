@@ -20,7 +20,7 @@ GOODNESS_OF_DATA_FOLDER_PATH = os.path.join(DATA_FILES_PATH, 'goodness_of_data')
 AGGREGATE_DATA_FOLDER_PATH = os.path.join(DATA_FILES_PATH, 'aggregate_data')
 today = datetime.now().strftime('%b%d').lower()
 EXPORT_FILES_PATH = os.path.join(DATA_FILES_PATH, "processed_data_{}yrs_bucket_{}".format(YEAR_BUCKET_SIZE, today))
-PROCESSED_DATA_FOLDER = "processed_data_{}yrs_bucket_aug09"
+PROCESSED_DATA_FOLDER = "processed_data_{}yrs_bucket_aug18"
 
 YEAR_BUCKET_SIZE_MULTIPLIERS = {
     3: 12,
