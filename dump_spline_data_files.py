@@ -34,7 +34,11 @@ def main():
                     data_pipe[str(age)] = np.nan
 
                 for cat_code in category_list:
-                    spline = spline_dict[cat_code]
+                    try:
+                        spline = spline_dict[cat_code]
+                    except KeyError:
+                        continue
+
                     for age in age_list:
                         if file_type == 'mtbi':
                             data_pipe.loc[data_pipe['UCC'] == cat_code, str(age)] = spline_value_for_age(age, spline)
@@ -44,6 +48,7 @@ def main():
                 gof_file_name = "{}_gof_{}.csv".format(file_type, part_file_name)
                 gof_file = os.path.join(config.GOODNESS_OF_FIT_FOLDER_PATH, gof_file_name)
                 gof_pipe = pd.read_csv(gof_file)
+                gof_pipe.dropna(inplace=True)
 
                 if file_type == 'mtbi':
                     god_list = gof_pipe[gof_pipe['GOODNESS_OF_DATA']]['UCC'].tolist()
