@@ -9,6 +9,7 @@ import config
 import os
 import utils
 import collections
+import textwrap
 
 app = dash.Dash(__name__)
 server = app.server
@@ -235,6 +236,9 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
     # u_spline = UnivariateSpline(x, y, w=1 / np.sqrt(var))
     xs = np.linspace(20, 80, 1000)
 
+    graph_title = utils.category_dict_for_file(file_type)[category_value]
+    wrapped_graph_title = textwrap.fill(graph_title, 85).replace("\n", "<br>")
+
     if graph_type == 'individual-bucket':
         return {
             'data': [
@@ -260,7 +264,7 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
                 )
             ],
             'layout': go.Layout(
-                title=utils.category_dict_for_file(file_type)[category_value],
+                title=wrapped_graph_title,
                 xaxis={'type': 'linear', 'title': 'Age (Years)'},
                 yaxis={'title': 'Average ($)'},
                 margin={'l': 80, 'b': 70, 't': 50, 'r': 20},
@@ -291,7 +295,7 @@ def update_graph(category_value, file_type, bucket_size, graph_type, year_slider
                 continue
 
         layout = go.Layout(
-            title=utils.category_dict_for_file(file_type)[category_value],
+            title=wrapped_graph_title,
             xaxis={'type': 'linear', 'title': 'Age (Years)'},
             yaxis={'title': 'Average ($)'},
             margin={'l': 80, 'b': 70, 't': 50, 'r': 20},
