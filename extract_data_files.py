@@ -5,7 +5,6 @@ from zipfile import *
 import os
 import constants
 import config
-import utils
 
 
 def main():
@@ -18,12 +17,12 @@ def extract_data_files(_type):
     if _type == constants.INTERVIEW_FILES:
         data_files_path = os.path.join(config.DATA_FILES_PATH, 'interview')
         extract_files_path = os.path.join(data_files_path, config.EXTRACT_FOLDER_NAME)
-        utils.make_folder(extract_files_path)
+        make_folder(extract_files_path)
         extract_file_types = constants.EXTRACT_INTERVIEW_FILE_TYPES
     elif _type == constants.DIARY_FILES:
         data_files_path = os.path.join(config.DATA_FILES_PATH, 'diary')
         extract_files_path = os.path.join(data_files_path, config.EXTRACT_FOLDER_NAME)
-        utils.make_folder(extract_files_path)
+        make_folder(extract_files_path)
         extract_file_types = constants.EXTRACT_DIARY_FILE_TYPES
 
     # Extract all the required data files
@@ -40,6 +39,12 @@ def extract_data_files(_type):
                         zip_archive.extract(file, path=extract_files_path)
 
             # break
+
+
+def make_folder(_files_path):
+    # Make extracted folder if it doesn't exist
+    if not os.path.exists(_files_path):
+        os.mkdir(_files_path)
 
 
 if __name__ == "__main__": main()
