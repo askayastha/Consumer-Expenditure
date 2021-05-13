@@ -1,5 +1,7 @@
-Consumer Expenditure Survey Data Wrangler
------------------------------------------
+Consumer Expenditure Survey Tool
+--------------------------------
+A web analytics tool that shows the data trends in graphs across different categories and years, derived from the data collected by Consumer Expenditure Surveys at the US Bureau of Labor Statistics.
+
 In the project directory, there are four major Python job scripts to handle the Consumer Expenditure Survey data.
 * download_data_files.py
 * extract_data_files.py
